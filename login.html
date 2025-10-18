@@ -70,7 +70,7 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
         localStorage.setItem("adminLoggedIn", "true"); // store session
-        window.location.href = "admin.html"; // redirect
+        window.location.href = "index.html"; // redirect
       } catch (error) {
         errorMsg.textContent = "⚠️ Invalid email or password. Try again.";
         errorMsg.classList.remove("hidden");
@@ -84,3 +84,4 @@
   </script>
 </body>
 </html>
+
