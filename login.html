@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | GreenWave ☀️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+</head>
+
+<body class="bg-gradient-to-br from-green-100 via-yellow-50 to-white flex items-center justify-center min-h-screen text-gray-800">
+  <div class="bg-white/70 backdrop-blur-md shadow-2xl rounded-3xl p-10 w-full max-w-md border border-white/40 text-center" data-aos="zoom-in">
+    <div class="mb-6">
+      <h1 class="text-4xl font-extrabold bg-gradient-to-r from-green-600 to-yellow-500 bg-clip-text text-transparent mb-2">
+        GreenWave ☀️
+      </h1>
+      <p class="text-gray-500 text-sm">Admin Dashboard Access</p>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <input id="email" type="email" placeholder="Email" required
+          class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 outline-none">
+      </div>
+      <div>
+        <input id="password" type="password" placeholder="Password" required
+          class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 outline-none">
+      </div>
+      <button type="submit"
+        class="w-full bg-gradient-to-r from-green-600 to-yellow-500 text-white py-3 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition-all">
+        🔐 Login to Dashboard
+      </button>
+      <p id="error" class="text-red-600 text-sm mt-3 hidden"></p>
+    </form>
+
+    <p class="text-xs text-gray-500 mt-8">
+      © 2025 GreenWave • Secured Admin Access
+    </p>
+  </div>
+
+  <!-- FIREBASE AUTH -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // 🧩 Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+      authDomain: "greenware-f23ff.firebaseapp.com",
+      projectId: "greenware-f23ff",
+      storageBucket: "greenware-f23ff.firebasestorage.app",
+      messagingSenderId: "870851351793",
+      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // 💻 Handle Login
+    const form = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        localStorage.setItem("adminLoggedIn", "true"); // store session
+        window.location.href = "admin.html"; // redirect
+      } catch (error) {
+        errorMsg.textContent = "⚠️ Invalid email or password. Try again.";
+        errorMsg.classList.remove("hidden");
+      }
+    });
+  </script>
+
+  <!-- INIT AOS -->
+  <script>
+    AOS.init({ duration: 800, once: true, offset: 100 });
+  </script>
+</body>
+</html>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GreenWave — Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <style>
+    /* small helpers */
+    .sidebar-btn-active { background: rgba(255,255,255,0.08); }
+    .card-input { border: 1px solid #e5e7eb; padding: .5rem; border-radius: .375rem; width:100%; }
+    .small { font-size:.85rem; color:#4b5563; }
+    .list-item { background:#fff; border:1px solid #e6f4ea; padding: .75rem; border-radius: .5rem; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-72 bg-gradient-to-b from-green-700 to-green-600 text-white p-6 flex flex-col">
+      <div>
+        <h1 class="text-2xl font-extrabold mb-6">☀️ Sonic Admin</h1>
+        <nav id="adminNav" class="space-y-2">
+          <!-- Keep these keys consistent with section IDs -->
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="dashboard">📊 Dashboard</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="hero">🏷 Hero</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="about">ℹ️ About</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="why">❓ Why Us</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="services">🛠 Services</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="calculators">🧮 Calculators</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="benefits">✅ Benefits</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="projects">🏗 Projects</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="testimonials">💬 Testimonials</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="contact">📞 Contact</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="blogs">📰 Blogs</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="forms">📩 Form Submissions</button>
+          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="footer">⚙️ Footer</button>
+        </nav>
+      </div>
+
+      <div class="mt-auto">
+        <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded mb-3">🚪 Logout</button>
+        <div class="text-xs text-white/80 small">Logged in as Admin</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="admin-section">
+        <h2 class="text-3xl font-bold text-green-700 mb-3">Dashboard</h2>
+        <p class="text-gray-600 mb-4">Quick actions & stats</p>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="bg-white p-4 rounded shadow">
+            <div class="text-sm text-gray-500">Total blog posts</div>
+            <div id="stat-blogs" class="text-2xl font-bold">—</div>
+          </div>
+          <div class="bg-white p-4 rounded shadow">
+            <div class="text-sm text-gray-500">Form submissions</div>
+            <div id="stat-forms" class="text-2xl font-bold">—</div>
+          </div>
+          <div class="bg-white p-4 rounded shadow">
+            <div class="text-sm text-gray-500">Last sync</div>
+            <div id="stat-sync" class="text-2xl font-bold">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HERO -->
+      <section id="hero" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Hero</h2>
+        <form id="heroForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
+          <label class="block">Title <input id="hero_title" class="card-input" /></label>
+          <label class="block">Subtitle <textarea id="hero_subtitle" class="card-input" rows="2"></textarea></label>
+          <label class="block">Button Text <input id="hero_button" class="card-input" /></label>
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="hero">💾 Save Hero</button>
+            <button id="heroReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="heroSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">About</h2>
+        <form id="aboutForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
+          <label>Title <input id="about_title" class="card-input" /></label>
+          <label>Description <textarea id="about_description" class="card-input" rows="3"></textarea></label>
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="text-sm font-semibold">Cards</div>
+              <button id="addAboutCard" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add Card</button>
+            </div>
+            <div id="aboutCards" class="space-y-3"></div>
+          </div>
+
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="about">💾 Save About</button>
+            <button id="aboutReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="aboutSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- WHY -->
+      <section id="why" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Why Us</h2>
+        <form id="whyForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
+          <label>Title <input id="why_title" class="card-input" /></label>
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <div class="text-sm font-semibold">Points</div>
+              <button id="addWhyPoint" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
+            </div>
+            <div id="whyPoints" class="space-y-2"></div>
+          </div>
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="why">💾 Save Why</button>
+            <button id="whyReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="whySaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- SERVICES -->
+      <section id="services" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Services</h2>
+        <form id="servicesForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
+          <div class="flex justify-between items-center mb-2">
+            <div class="text-sm font-semibold">Service Cards</div>
+            <button id="addService" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add Service</button>
+          </div>
+          <div id="servicesList" class="space-y-3"></div>
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="services">💾 Save Services</button>
+            <button id="servicesReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="servicesSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- CALCULATORS -->
+      <section id="calculators" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Calculators</h2>
+        <form id="calcForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Bill Savings Calculator Defaults</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <label>Default bill (₹) <input id="calc_bill_default" class="card-input" type="number" /></label>
+            <label>Default area (m²) <input id="calc_area_default" class="card-input" type="number" /></label>
+            <label>Tariff (₹/kWh) <input id="calc_tariff" class="card-input" type="number" step="0.1" /></label>
+            <label>Sunlight (hrs/day) <input id="calc_sun" class="card-input" type="number" step="0.1" /></label>
+            <label>System cost (₹/kW) <input id="calc_costkw" class="card-input" type="number" /></label>
+            <label>Density (W/m²) <input id="calc_density" class="card-input" type="number" /></label>
+          </div>
+
+          <h3 class="font-semibold mt-3">Comparison Defaults</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <label>Investment default (₹) <input id="cmp_invest_default" class="card-input" type="number" /></label>
+            <label>Years default <input id="cmp_years_default" class="card-input" type="number" /></label>
+            <label>FD rate (%) <input id="cmp_fd_default" class="card-input" type="number" step="0.1" /></label>
+            <label>Real estate (%) <input id="cmp_re_default" class="card-input" type="number" step="0.1" /></label>
+            <label>MF rate (%) <input id="cmp_mf_default" class="card-input" type="number" step="0.1" /></label>
+          </div>
+
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="calculators">💾 Save Calculators</button>
+            <button id="calcReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="calcSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- BENEFITS -->
+      <section id="benefits" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Benefits</h2>
+        <form id="benefitsForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
+          <div class="flex justify-between items-center mb-2">
+            <div class="text-sm font-semibold">Benefits List</div>
+            <button id="addBenefit" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
+          </div>
+          <div id="benefitsList" class="space-y-3"></div>
+
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="benefits">💾 Save Benefits</button>
+            <button id="benefitsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="benefitsSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="projects" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Projects</h2>
+        <form id="projectsForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
+          <div class="flex justify-between items-center mb-2">
+            <div class="text-sm font-semibold">Project Cards</div>
+            <button id="addProject" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
+          </div>
+          <div id="projectsList" class="space-y-3"></div>
+
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="projects">💾 Save Projects</button>
+            <button id="projectsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="projectsSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section id="testimonials" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Testimonials</h2>
+        <form id="testimonialsForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
+          <div class="flex justify-between items-center mb-2">
+            <div class="text-sm font-semibold">Testimonial Cards</div>
+            <button id="addTestimonial" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
+          </div>
+          <div id="testimonialsList" class="space-y-3"></div>
+
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="testimonials">💾 Save Testimonials</button>
+            <button id="testimonialsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="testimonialsSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Contact</h2>
+        <form id="contactForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
+          <label>Title <input id="contact_title" class="card-input" /></label>
+          <label>Subtitle <textarea id="contact_subtitle" class="card-input" rows="2"></textarea></label>
+          <label>Note <input id="contact_note" class="card-input" /></label>
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="contact">💾 Save Contact</button>
+            <button id="contactReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="contactSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+
+     <!-- BLOGS -->
+<section id="blogs" class="admin-section hidden">
+  <h2 class="text-2xl font-bold text-green-700 mb-4">📰 Manage Blogs</h2>
+
+  <!-- Add Basic Blog -->
+  <form id="blogForm" class="grid md:grid-cols-2 gap-3 mb-6 bg-white p-4 rounded shadow">
+    <input id="blog_title" placeholder="Blog Title" class="card-input" />
+    <input id="blog_author" placeholder="Author" class="card-input" />
+    <input id="blog_date" type="date" class="card-input" />
+    <input id="blog_image" placeholder="Main Image URL" class="card-input md:col-span-2" />
+    <textarea id="blog_content" placeholder="Blog Summary..." rows="3" class="card-input md:col-span-2"></textarea>
+    <div class="md:col-span-2 flex gap-3">
+      <button id="addBlogBtn" class="bg-green-600 text-white px-4 py-2 rounded">➕ Add Blog</button>
+      <button id="blogsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+      <p id="blogsSaveMsg" class="text-sm text-green-600 hidden self-center">✅ Saved!</p>
+    </div>
+  </form>
+
+  <!-- List Blogs -->
+  <div id="blogsList" class="space-y-3"></div>
+
+  <!-- Detailed Blog Builder -->
+  <div id="detailEditor" class="hidden bg-white rounded-xl p-6 mt-8 shadow-lg">
+    <h3 class="text-xl font-semibold text-green-700 mb-4">🧩 Detailed Blog Builder</h3>
+    <p id="detailNote" class="text-gray-500 text-sm mb-4">Editing blog: <span id="currentBlogTitle">-</span></p>
+
+    <div id="blogBlocks" class="space-y-3 mb-4"></div>
+
+    <div class="flex gap-2 mb-4">
+      <button id="addTextBlock" class="bg-green-500 text-white px-3 py-1 rounded text-sm">➕ Add Text Block</button>
+      <button id="addImageBlock" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">🖼 Add Image Block</button>
+    </div>
+
+    <button id="saveDetail" class="bg-green-700 text-white px-4 py-2 rounded">💾 Save Full Blog</button>
+    <button id="closeDetail" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">✖ Close</button>
+  </div>
+</section>
+
+
+      <!-- FORM SUBMISSIONS -->
+      <section id="forms" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Form Submissions</h2>
+        <div id="formSubmissions" class="space-y-3 bg-white p-4 rounded shadow">
+          <p class="text-gray-500">Loading...</p>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <section id="footer" class="admin-section hidden">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">Footer</h2>
+        <form id="footerForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
+          <label>Title <input id="footer_title" class="card-input" /></label>
+          <label>Subtitle <input id="footer_subtitle" class="card-input" /></label>
+          <label>Links (comma separated) <input id="footer_links" class="card-input" /></label>
+          <label>Copyright <input id="footer_copyright" class="card-input" /></label>
+          <div class="flex gap-3">
+            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="footer">💾 Save Footer</button>
+            <button id="footerReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+            <p id="footerSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- Firebase + Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, update, push, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // YOUR FIREBASE CONFIG (from earlier messages)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+      authDomain: "greenware-f23ff.firebaseapp.com",
+      databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "greenware-f23ff",
+      storageBucket: "greenware-f23ff.firebasestorage.app",
+      messagingSenderId: "870851351793",
+      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // --- Auth guard ---
+    onAuthStateChanged(auth, (user) => {
+      if (!user && localStorage.getItem("adminLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+      } catch(e){}
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = 'login.html';
+    });
+
+    // --- Navigation ---
+    const sections = document.querySelectorAll('.admin-section');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    function showSection(id){
+      sections.forEach(s => s.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      navBtns.forEach(b => b.classList.remove('sidebar-btn-active'));
+      document.querySelector(`[data-section="${id}"]`)?.classList.add('sidebar-btn-active');
+    }
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => showSection(btn.dataset.section));
+    });
+    // default
+    showSection('dashboard');
+
+    // small helper for save feedback
+    function flashMsg(el){
+      el.classList.remove('hidden');
+      setTimeout(()=> el.classList.add('hidden'), 2000);
+    }
+
+    // global snapshot listener to update stats & last sync
+    onValue(ref(db, 'websiteContent'), (snap)=>{
+      document.getElementById('stat-sync').textContent = new Date().toLocaleString();
+      const data = snap.val() || {};
+      // stats
+      const blogs = (data.blogs && data.blogs.posts) ? Object.keys(data.blogs.posts).length : 0;
+      const forms = (data.formSubmissions && data.formSubmissions.submissions) ? Object.keys(data.formSubmissions.submissions).length : 0;
+      document.getElementById('stat-blogs').textContent = blogs;
+      document.getElementById('stat-forms').textContent = forms;
+    });
+
+    // --- Generic save for simple object paths ---
+    document.querySelectorAll('.save-btn').forEach(btn=>{
+      btn.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        const path = btn.dataset.path; // e.g. "hero", "about", ...
+        try {
+          switch(path){
+            case 'hero':
+              await update(ref(db, 'websiteContent/hero'), {
+                title: document.getElementById('hero_title').value || '',
+                subtitle: document.getElementById('hero_subtitle').value || '',
+                button: document.getElementById('hero_button').value || ''
+              });
+              flashMsg(document.getElementById('heroSaveMsg'));
+              break;
+            case 'about': {
+              const title = document.getElementById('about_title').value || '';
+              const desc = document.getElementById('about_description').value || '';
+              // collect cards
+              const cards = [];
+              document.querySelectorAll('#aboutCards .about-card').forEach(card=>{
+                cards.push({
+                  title: card.querySelector('.card-title').value || '',
+                  desc: card.querySelector('.card-desc').value || ''
+                });
+              });
+              await update(ref(db, 'websiteContent/about'), { title, description: desc, cards });
+              flashMsg(document.getElementById('aboutSaveMsg'));
+              break;
+            }
+            case 'why': {
+              const title = document.getElementById('why_title').value || '';
+              const points = [];
+              document.querySelectorAll('#whyPoints input').forEach(i=> points.push(i.value || ''));
+              await update(ref(db, 'websiteContent/why'), { title, points });
+              flashMsg(document.getElementById('whySaveMsg'));
+              break;
+            }
+            case 'services': {
+              const cards = [];
+              document.querySelectorAll('#servicesList .service-item').forEach(el=>{
+                cards.push({
+                  title: el.querySelector('.service-title').value || '',
+                  desc: el.querySelector('.service-desc').value || '',
+                  tag: el.querySelector('.service-tag') ? el.querySelector('.service-tag').value : ''
+                });
+              });
+              await update(ref(db, 'websiteContent/services'), { cards });
+              flashMsg(document.getElementById('servicesSaveMsg'));
+              break;
+            }
+            case 'calculators': {
+              const payload = {
+                billDefault: Number(document.getElementById('calc_bill_default').value) || 600,
+                areaDefault: Number(document.getElementById('calc_area_default').value) || 60,
+                tariff: Number(document.getElementById('calc_tariff').value) || 8,
+                sun: Number(document.getElementById('calc_sun').value) || 5,
+                costPerKw: Number(document.getElementById('calc_costkw').value) || 65000,
+                density: Number(document.getElementById('calc_density').value) || 180,
+                comparison: {
+                  investDefault: Number(document.getElementById('cmp_invest_default').value) || 195000,
+                  yearsDefault: Number(document.getElementById('cmp_years_default').value) || 10,
+                  fdRate: Number(document.getElementById('cmp_fd_default').value) || 6.5,
+                  reRate: Number(document.getElementById('cmp_re_default').value) || 8,
+                  mfRate: Number(document.getElementById('cmp_mf_default').value) || 12
+                }
+              };
+              await update(ref(db, 'websiteContent/calculators'), payload);
+              flashMsg(document.getElementById('calcSaveMsg'));
+              break;
+            }
+            case 'benefits': {
+              const list = [];
+              document.querySelectorAll('#benefitsList .benefit-item').forEach(el=>{
+                list.push({ title: el.querySelector('.benefit-title').value || '', desc: el.querySelector('.benefit-desc').value || '' });
+              });
+              await update(ref(db, 'websiteContent/benefits'), { list });
+              flashMsg(document.getElementById('benefitsSaveMsg'));
+              break;
+            }
+            case 'projects': {
+              const cards = [];
+              document.querySelectorAll('#projectsList .project-item').forEach(el=>{
+                cards.push({
+                  name: el.querySelector('.project-name').value || '',
+                  details: el.querySelector('.project-details').value || '',
+                  badge: el.querySelector('.project-badge').value || '',
+                  image: el.querySelector('.project-image').value || ''
+                });
+              });
+              await update(ref(db, 'websiteContent/projects'), { cards });
+              flashMsg(document.getElementById('projectsSaveMsg'));
+              break;
+            }
+            case 'testimonials': {
+              const cards = [];
+              document.querySelectorAll('#testimonialsList .testimonial-item').forEach(el=>{
+                cards.push({
+                  quote: el.querySelector('.test-quote').value || '',
+                  name: el.querySelector('.test-name').value || '',
+                  role: el.querySelector('.test-role').value || ''
+                });
+              });
+              await update(ref(db, 'websiteContent/testimonials'), { cards });
+              flashMsg(document.getElementById('testimonialsSaveMsg'));
+              break;
+            }
+            case 'contact': {
+              await update(ref(db, 'websiteContent/contact'), {
+                title: document.getElementById('contact_title').value || '',
+                subtitle: document.getElementById('contact_subtitle').value || '',
+                note: document.getElementById('contact_note').value || ''
+              });
+              flashMsg(document.getElementById('contactSaveMsg'));
+              break;
+            }
+            case 'footer': {
+              const links = (document.getElementById('footer_links').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+              await update(ref(db, 'websiteContent/footer'), {
+                title: document.getElementById('footer_title').value || '',
+                subtitle: document.getElementById('footer_subtitle').value || '',
+                links,
+                copyright: document.getElementById('footer_copyright').value || ''
+              });
+              flashMsg(document.getElementById('footerSaveMsg'));
+              break;
+            }
+            default:
+              console.warn('unknown save path', path);
+          }
+        } catch (err) {
+          console.error('save error', err);
+          alert('Failed to save — check console.');
+        }
+      });
+    });
+
+    // --- reload buttons: load current snapshot into form fields ---
+    async function loadHero(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/hero'), s=>res(s), { onlyOnce:true }));
+      const data = snap.val() || {};
+      document.getElementById('hero_title').value = data.title || '';
+      document.getElementById('hero_subtitle').value = data.subtitle || '';
+      document.getElementById('hero_button').value = data.button || '';
+    }
+    document.getElementById('heroReload').addEventListener('click', loadHero);
+
+    async function loadAbout(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/about'), s=>res(s), { onlyOnce:true }));
+      const data = snap.val() || {};
+      document.getElementById('about_title').value = data.title || '';
+      document.getElementById('about_description').value = data.description || '';
+      // cards
+      const cards = data.cards || [];
+      const container = document.getElementById('aboutCards');
+      container.innerHTML = '';
+      cards.forEach((c, idx)=>{
+        container.appendChild(makeAboutCard(c.title, c.desc));
+      });
+    }
+    document.getElementById('aboutReload').addEventListener('click', loadAbout);
+
+    async function loadWhy(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/why'), s=>res(s), { onlyOnce:true }));
+      const data = snap.val() || {};
+      document.getElementById('why_title').value = data.title || '';
+      const points = data.points || [];
+      const container = document.getElementById('whyPoints');
+      container.innerHTML = '';
+      points.forEach(p => {
+        const input = document.createElement('input');
+        input.className = 'card-input';
+        input.value = p || '';
+        container.appendChild(input);
+      });
+    }
+    document.getElementById('whyReload').addEventListener('click', loadWhy);
+
+    async function loadServices(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/services'), s=>res(s), { onlyOnce:true }));
+      const data = snap.val() || {};
+      const cards = data.cards || [];
+      const container = document.getElementById('servicesList');
+      container.innerHTML = '';
+      cards.forEach(c => container.appendChild(makeServiceItem(c.title,c.desc,c.tag||'')));
+    }
+    document.getElementById('servicesReload').addEventListener('click', loadServices);
+
+    async function loadCalculators(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/calculators'), s=>res(s), { onlyOnce:true }));
+      const d = snap.val() || {};
+      document.getElementById('calc_bill_default').value = d.billDefault || 600;
+      document.getElementById('calc_area_default').value = d.areaDefault || 60;
+      document.getElementById('calc_tariff').value = d.tariff || 8;
+      document.getElementById('calc_sun').value = d.sun || 5;
+      document.getElementById('calc_costkw').value = d.costPerKw || 65000;
+      document.getElementById('calc_density').value = d.density || 180;
+      const c = d.comparison || {};
+      document.getElementById('cmp_invest_default').value = c.investDefault || 195000;
+      document.getElementById('cmp_years_default').value = c.yearsDefault || 10;
+      document.getElementById('cmp_fd_default').value = c.fdRate || 6.5;
+      document.getElementById('cmp_re_default').value = c.reRate || 8;
+      document.getElementById('cmp_mf_default').value = c.mfRate || 12;
+    }
+    document.getElementById('calcReload').addEventListener('click', loadCalculators);
+
+    async function loadBenefits(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/benefits'), s=>res(s), { onlyOnce:true }));
+      const d = snap.val() || {};
+      const arr = d.list || [];
+      const container = document.getElementById('benefitsList'); container.innerHTML='';
+      arr.forEach(i => container.appendChild(makeBenefitItem(i.title,i.desc)));
+    }
+    document.getElementById('benefitsReload').addEventListener('click', loadBenefits);
+
+    async function loadProjects(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/projects'), s=>res(s), { onlyOnce:true }));
+      const d = snap.val() || {};
+      const arr = d.cards || [];
+      const container = document.getElementById('projectsList'); container.innerHTML='';
+      arr.forEach(i => container.appendChild(makeProjectItem(i.name,i.details,i.badge,i.image)));
+    }
+    document.getElementById('projectsReload').addEventListener('click', loadProjects);
+
+    async function loadTestimonials(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/testimonials'), s=>res(s), { onlyOnce:true }));
+      const d = snap.val() || {};
+      const arr = d.cards || [];
+      const container = document.getElementById('testimonialsList'); container.innerHTML='';
+      arr.forEach(i => container.appendChild(makeTestimonialItem(i.quote,i.name,i.role)));
+    }
+    document.getElementById('testimonialsReload').addEventListener('click', loadTestimonials);
+
+    async function loadContact(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/contact'), s=>res(s), { onlyOnce:true }));
+      const d = snap.val() || {};
+      document.getElementById('contact_title').value = d.title || '';
+      document.getElementById('contact_subtitle').value = d.subtitle || '';
+      document.getElementById('contact_note').value = d.note || '';
+    }
+    document.getElementById('contactReload').addEventListener('click', loadContact);
+
+    async function loadFooter(){
+      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/footer'), s=>res(s), { onlyOnce:true }));
+      const d = snap.val() || {};
+      document.getElementById('footer_title').value = d.title || '';
+      document.getElementById('footer_subtitle').value = d.subtitle || '';
+      document.getElementById('footer_links').value = (d.links || []).join(', ');
+      document.getElementById('footer_copyright').value = d.copyright || '';
+    }
+    document.getElementById('footerReload').addEventListener('click', loadFooter);
+
+    // --- List helpers factories ---
+    function makeAboutCard(title='', desc=''){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'about-card list-item flex gap-2 items-start';
+      wrapper.innerHTML = `
+        <div class="flex-1">
+          <input class="card-title card-input mb-1" placeholder="Card title" value="${escapeHtml(title)}" />
+          <textarea class="card-desc card-input" rows="2" placeholder="Card description">${escapeHtml(desc)}</textarea>
+        </div>
+        <div class="flex flex-col gap-2">
+          <button class="remove-about bg-red-500 text-white px-2 py-1 rounded">Remove</button>
+        </div>
+      `;
+      wrapper.querySelector('.remove-about').addEventListener('click', ()=> wrapper.remove());
+      return wrapper;
+    }
+
+    function makeServiceItem(title='',desc='',tag=''){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'service-item list-item grid grid-cols-12 gap-2 items-center';
+      wrapper.innerHTML = `
+        <div class="col-span-4"><input class="service-title card-input" placeholder="Service title" value="${escapeHtml(title)}"/></div>
+        <div class="col-span-6"><input class="service-desc card-input" placeholder="Service desc" value="${escapeHtml(desc)}"/></div>
+        <div class="col-span-1"><input class="service-tag card-input" placeholder="Tag" value="${escapeHtml(tag)}"/></div>
+        <div class="col-span-1"><button class="remove-service bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
+      `;
+      wrapper.querySelector('.remove-service').addEventListener('click', ()=> wrapper.remove());
+      return wrapper;
+    }
+
+    function makeBenefitItem(title='',desc=''){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'benefit-item list-item grid grid-cols-12 gap-2';
+      wrapper.innerHTML = `
+        <div class="col-span-4"><input class="benefit-title card-input" placeholder="Title" value="${escapeHtml(title)}"/></div>
+        <div class="col-span-7"><input class="benefit-desc card-input" placeholder="Description" value="${escapeHtml(desc)}"/></div>
+        <div class="col-span-1"><button class="remove-benefit bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
+      `;
+      wrapper.querySelector('.remove-benefit').addEventListener('click', ()=> wrapper.remove());
+      return wrapper;
+    }
+
+    function makeProjectItem(name='', details='', badge='', image=''){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'project-item list-item grid grid-cols-12 gap-2';
+      wrapper.innerHTML = `
+        <div class="col-span-3"><input class="project-name card-input" placeholder="Name" value="${escapeHtml(name)}"/></div>
+        <div class="col-span-5"><input class="project-details card-input" placeholder="Details" value="${escapeHtml(details)}"/></div>
+        <div class="col-span-2"><input class="project-badge card-input" placeholder="Badge (e.g. ⚡ 15 kW)" value="${escapeHtml(badge)}"/></div>
+        <div class="col-span-1"><input class="project-image card-input" placeholder="Image URL" value="${escapeHtml(image)}"/></div>
+        <div class="col-span-1"><button class="remove-project bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
+      `;
+      wrapper.querySelector('.remove-project').addEventListener('click', ()=> wrapper.remove());
+      return wrapper;
+    }
+
+    function makeTestimonialItem(quote='', name='', role=''){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'testimonial-item list-item grid grid-cols-12 gap-2';
+      wrapper.innerHTML = `
+        <div class="col-span-6"><textarea class="test-quote card-input" rows="2" placeholder="Quote">${escapeHtml(quote)}</textarea></div>
+        <div class="col-span-3"><input class="test-name card-input" placeholder="Name" value="${escapeHtml(name)}"/></div>
+        <div class="col-span-2"><input class="test-role card-input" placeholder="Role" value="${escapeHtml(role)}"/></div>
+        <div class="col-span-1"><button class="remove-testimonial bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
+      `;
+      wrapper.querySelector('.remove-testimonial').addEventListener('click', ()=> wrapper.remove());
+      return wrapper;
+    }
+
+    // escape helper to avoid HTML injection in value insertion
+    function escapeHtml(s=''){ return (s+'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+    // --- Add buttons wiring ---
+    document.getElementById('addAboutCard').addEventListener('click', ()=> document.getElementById('aboutCards').appendChild(makeAboutCard()));
+    document.getElementById('addWhyPoint').addEventListener('click', ()=> {
+      const input = document.createElement('input');
+      input.className = 'card-input';
+      input.placeholder = 'Point';
+      document.getElementById('whyPoints').appendChild(input);
+    });
+    document.getElementById('addService').addEventListener('click', ()=> document.getElementById('servicesList').appendChild(makeServiceItem()));
+    document.getElementById('addBenefit').addEventListener('click', ()=> document.getElementById('benefitsList').appendChild(makeBenefitItem()));
+    document.getElementById('addProject').addEventListener('click', ()=> document.getElementById('projectsList').appendChild(makeProjectItem()));
+    document.getElementById('addTestimonial').addEventListener('click', ()=> document.getElementById('testimonialsList').appendChild(makeTestimonialItem()));
+
+    // --- Blogs CRUD via push/remove/update ---
+    const blogTitle = document.getElementById('blog_title');
+    const blogAuthor = document.getElementById('blog_author');
+    const blogDate = document.getElementById('blog_date');
+    const blogImage = document.getElementById('blog_image');
+    const blogContent = document.getElementById('blog_content');
+    const addBlogBtn = document.getElementById('addBlogBtn');
+    const blogsListEl = document.getElementById('blogsList');
+
+    addBlogBtn.addEventListener('click', async (e)=>{
+      e.preventDefault();
+      const post = {
+        title: blogTitle.value || '',
+        author: blogAuthor.value || '',
+        date: blogDate.value || new Date().toISOString().slice(0,10),
+        image: blogImage.value || '',
+        content: blogContent.value || ''
+      };
+      try {
+        await push(ref(db, 'websiteContent/blogs/posts'), post);
+        document.getElementById('blogsSaveMsg').classList.remove('hidden');
+        setTimeout(()=>document.getElementById('blogsSaveMsg').classList.add('hidden'), 2000);
+        blogTitle.value=''; blogAuthor.value=''; blogDate.value=''; blogImage.value=''; blogContent.value='';
+      } catch(e){ console.error(e); alert('Failed to add blog'); }
+    });
+
+onValue(ref(db, 'websiteContent/blogs/posts'), (snap) => {
+  const posts = snap.val() || {};
+  blogsListEl.innerHTML = '';
+  Object.entries(posts).forEach(([key, post]) => {
+    const div = document.createElement('div');
+    div.className = 'list-item flex justify-between items-start gap-3';
+    div.innerHTML = `
+      <div class="flex-1">
+        <div class="font-bold text-green-700">${escapeHtml(post.title)}</div>
+        <div class="small text-gray-500">${escapeHtml(post.author)} • ${escapeHtml(post.date || '')}</div>
+        <div class="text-gray-700 mt-2">${escapeHtml((post.content || '').slice(0, 200))}${(post.content || '').length > 200 ? '...' : ''}</div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <button class="edit-blog bg-yellow-400 text-white px-3 py-1 rounded" data-key="${key}">Edit</button>
+        <button class="detail-blog bg-blue-500 text-white px-3 py-1 rounded" data-key="${key}" data-title="${escapeHtml(post.title)}">🧩 Details</button>
+        <button class="delete-blog bg-red-500 text-white px-3 py-1 rounded" data-key="${key}">Delete</button>
+      </div>
+    `;
+    blogsListEl.appendChild(div);
+  });
+
+  // Attach handlers
+  document.querySelectorAll('.delete-blog').forEach(btn => {
+    btn.onclick = async () => {
+      if (!confirm('Delete this blog?')) return;
+      try {
+        await remove(ref(db, 'websiteContent/blogs/posts/' + btn.dataset.key));
+      } catch (e) { console.error(e); alert('Delete failed'); }
+    };
+  });
+
+  document.querySelectorAll('.edit-blog').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.dataset.key;
+      onValue(ref(db, `websiteContent/blogs/posts/${key}`), s => {
+        const p = s.val() || {};
+        blogTitle.value = p.title || '';
+        blogAuthor.value = p.author || '';
+        blogDate.value = p.date || '';
+        blogImage.value = p.image || '';
+        blogContent.value = p.content || '';
+        if (confirm('Open this post in the editor. Click OK to remove the old post so you can re-add after editing.')) {
+          remove(ref(db, `websiteContent/blogs/posts/${key}`));
+        }
+      }, { onlyOnce: true });
+    };
+  });
+});
+
+    // --- BLOG DETAILED BUILDER ---
+const detailEditor = document.getElementById("detailEditor");
+const blogBlocks = document.getElementById("blogBlocks");
+const addTextBlock = document.getElementById("addTextBlock");
+const addImageBlock = document.getElementById("addImageBlock");
+const saveDetail = document.getElementById("saveDetail");
+const closeDetail = document.getElementById("closeDetail");
+let currentBlogKey = null;
+
+// Helper to make text/image blocks
+function makeTextBlock(text = "") {
+  const div = document.createElement("div");
+  div.className = "border rounded p-3 bg-gray-50";
+  div.innerHTML = `
+    <textarea class="block-input w-full border rounded p-2" rows="3" placeholder="Enter paragraph...">${text}</textarea>
+    <button class="mt-2 text-red-600 text-sm removeBlock">Remove</button>
+  `;
+  div.querySelector(".removeBlock").onclick = () => div.remove();
+  return div;
+}
+
+function makeImageBlock(url = "") {
+  const div = document.createElement("div");
+  div.className = "border rounded p-3 bg-gray-50";
+  div.innerHTML = `
+    <input type="text" value="${url}" placeholder="Image URL" class="block-input w-full border rounded p-2" />
+    <button class="mt-2 text-red-600 text-sm removeBlock">Remove</button>
+  `;
+  div.querySelector(".removeBlock").onclick = () => div.remove();
+  return div;
+}
+
+// Add new blocks
+addTextBlock.onclick = () => blogBlocks.appendChild(makeTextBlock());
+addImageBlock.onclick = () => blogBlocks.appendChild(makeImageBlock());
+closeDetail.onclick = () => detailEditor.classList.add("hidden");
+
+// Open detail builder
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("detail-blog")) {
+    const key = e.target.dataset.key;
+    currentBlogKey = key;
+    const blog = e.target.dataset.title;
+    document.getElementById("currentBlogTitle").textContent = blog;
+    detailEditor.classList.remove("hidden");
+
+    // Load existing detail if present
+    blogBlocks.innerHTML = "";
+    const detailRef = ref(db, `websiteContent/blogs/details/${key}`);
+    onValue(detailRef, (snap) => {
+      const data = snap.val() || [];
+      blogBlocks.innerHTML = "";
+      data.forEach((block) => {
+        if (block.type === "text") blogBlocks.appendChild(makeTextBlock(block.content));
+        if (block.type === "image") blogBlocks.appendChild(makeImageBlock(block.url));
+      });
+    }, { onlyOnce: true });
+  }
+});
+
+// Save detailed blog
+saveDetail.onclick = async () => {
+  if (!currentBlogKey) return alert("No blog selected!");
+  const blocks = [];
+  blogBlocks.querySelectorAll(".block-input").forEach((el) => {
+    if (el.tagName === "TEXTAREA") {
+      blocks.push({ type: "text", content: el.value });
+    } else {
+      blocks.push({ type: "image", url: el.value });
+    }
+  });
+
+  await set(ref(db, `websiteContent/blogs/details/${currentBlogKey}`), blocks);
+  alert("✅ Detailed content saved!");
+};
+
+
+    // --- Form submissions viewer ---
+    const submissionsEl = document.getElementById('formSubmissions');
+    onValue(ref(db, 'websiteContent/formSubmissions/submissions'), (snap)=>{
+      const data = snap.val();
+      submissionsEl.innerHTML = '';
+      if(!data) {
+        submissionsEl.innerHTML = '<p class="text-gray-500">No submissions yet.</p>';
+        return;
+      }
+      Object.entries(data).forEach(([key, entry])=>{
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-bold text-green-700">${escapeHtml(entry.name||'Anonymous')}</div>
+              <div class="small text-gray-500">${escapeHtml(entry.email||'-')} • ${escapeHtml(entry.phone||'-')}</div>
+              <div class="text-gray-700 mt-2">${escapeHtml(entry.message||'')}</div>
+              <div class="text-xs text-gray-400 mt-1">${escapeHtml(entry.city||'')}</div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button class="delete-sub bg-red-500 text-white px-2 py-1 rounded" data-key="${key}">Delete</button>
+            </div>
+          </div>
+        `;
+        submissionsEl.appendChild(div);
+      });
+      document.querySelectorAll('.delete-sub').forEach(btn=>{
+        btn.onclick = async ()=>{
+          if(!confirm('Delete submission?')) return;
+          try { await remove(ref(db, `websiteContent/formSubmissions/submissions/${btn.dataset.key}`)); } catch(e){ console.error(e); }
+        };
+      });
+    });
+
+    // --- On load: populate forms with existing content ---
+    (async function initialLoad(){
+      // hero, about, why, services, calculators, benefits, projects, testimonials, contact, footer
+      await Promise.all([loadHero(), loadAbout(), loadWhy(), loadServices(), loadCalculators(), loadBenefits(), loadProjects(), loadTestimonials(), loadContact(), loadFooter()]);
+      // load blogs handled by onValue above automatically
+    })();
+
+    // --- small utilities ---
+    function attachRemoveHandlers(parentSelector, removeSelector){
+      document.querySelectorAll(parentSelector + ' ' + removeSelector).forEach(btn=> btn.addEventListener('click', ()=>btn.closest(parentSelector).remove()));
+    }
+
+    // Init AOS
+    AOS.init({ duration: 800, once: true });
+  </script>
+</body>
+</html>
