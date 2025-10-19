@@ -1,1147 +1,1252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GreenWave — Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>GreenWave</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/169/169367.png" />
   <style>
-    /* small helpers */
-    .sidebar-btn-active { background: rgba(255,255,255,0.08); }
-    .card-input { border: 1px solid #e5e7eb; padding: .5rem; border-radius: .375rem; width:100%; }
-    .small { font-size:.85rem; color:#4b5563; }
-    .list-item { background:#fff; border:1px solid #e6f4ea; padding: .75rem; border-radius: .5rem; }
+    html { scroll-behavior: smooth; }
+    .gradient-text {
+      background: linear-gradient(90deg, #00c853, #fdd835);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      position: relative;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fdd835 0%, #00c853 100%);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 10px rgba(0, 200, 83, 0.5);
+      transform: translateY(-1px);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fdd835 0%, #00c853 100%);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 10px rgba(0, 200, 83, 0.5);
+    }
+
+    /* ===== RESPONSIVE FIXES FOR CALCULATORS SECTION ===== */
+  @media (max-width: 1024px) {
+    #calculators {
+      padding: 3rem 1rem;
+      overflow-x: hidden;
+    }
+    #calculators .grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    #calculators {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    #calculators input[type="range"] {
+      width: 100%;
+    }
+
+    #calculators .bg-white {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-radius: 0.75rem;
+      padding: 1rem;
+    }
+
+    #calculators canvas {
+      max-width: 100%;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    #calculators .text-3xl {
+      font-size: 1.75rem;
+      line-height: 2rem;
+    }
+
+    #calculators .text-2xl {
+      font-size: 1.25rem;
+    }
+
+    #calculators .p-6 {
+      padding: 1rem !important;
+    }
+
+    #calculators .rounded-xl {
+      border-radius: 0.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #calculators {
+      padding: 2rem 0.75rem;
+    }
+
+    #calculators h2 {
+      font-size: 1.5rem !important;
+      text-align: center;
+    }
+
+    #calculators p {
+      font-size: 0.9rem !important;
+      text-align: center;
+    }
+
+    #calculators input,
+    #calculators select {
+      font-size: 0.9rem;
+      padding: 0.5rem;
+    }
+
+    #calculators label {
+      font-size: 0.8rem;
+    }
+
+    #calculators .grid {
+      gap: 1rem;
+    }
+
+    #calculators canvas {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+  }
+
+  /* Fix container sizing and overflow for all sections */
+body, html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+section, nav, footer, header {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Prevent partial responsive break triggers */
+.max-w-6xl, .max-w-7xl, .max-w-5xl {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .grid, [class*="grid-cols-"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
-  <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
 
-<aside class="w-72 bg-gradient-to-b from-green-700 to-green-600 text-white p-6 flex flex-col fixed top-0 left-0 h-full overflow-y-auto">
+<body class="font-sans text-gray-800 bg-white">
+<!-- NAVBAR -->
+<nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50" data-aos="fade-down">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold gradient-text" data-key="site.name">GreenWave</h1>
+    <ul class="hidden md:flex gap-6 text-gray-700 font-medium">
+      <li><a href="#hero" class="hover:text-green-600">Home</a></li>
+      <li><a href="#about" class="hover:text-green-600">About</a></li>
+      <li><a href="#why" class="hover:text-green-600">Why Us</a></li>
+      <li><a href="#services" class="hover:text-green-600">Services</a></li>
+      <li><a href="#benefits" class="hover:text-green-600">Benefits</a></li>
+      <li><a href="#projects" class="hover:text-green-600">Projects</a></li>
+      <li><a href="#testimonials" class="hover:text-green-600">Testimonials</a></li>
+      <li><a href="#contact" class="hover:text-green-600">Contact</a></li>
+      <li><a href="blog.html" class="hover:text-green-600 transition">Blogs</a></li>
+    </ul>
+    <button id="menu-btn" class="md:hidden text-gray-800 text-3xl focus:outline-none">☰</button>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div id="mobile-menu" class="fixed top-0 right-0 h-screen bg-white shadow-2xl flex flex-col items-center justify-center gap-12 text-xl text-gray-800 transform translate-x-full transition-all duration-500 ease-in-out z-50" style="width: 65vw;">
+  <button id="close-btn" class="absolute top-6 right-6 text-4xl text-gray-800 hover:text-green-600 transition">✖</button>
+  <a href="#hero" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="100">Home</a>
+  <a href="#about" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="200">About</a>
+  <a href="#why" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="300">Why Us</a>
+  <a href="#services" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="400">Services</a>
+  <a href="#benefits" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="500">Benefits</a>
+  <a href="#projects" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="600">Projects</a>
+  <a href="#testimonials" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="700">Testimonials</a>
+  <a href="#contact" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="800">Contact</a>
+  <a href="blog.html" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="900">Blogs</a>
+</div>
+<div id="overlay" class="fixed inset-0 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-500 z-40"></div>
+
+<!-- HERO -->
+<section id="hero" class="pt-32 pb-20 bg-gradient-to-r from-green-50 to-yellow-50">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10">
+    <div class="flex-1 text-center md:text-left">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4 gradient-text" data-aos="fade-right" data-key="hero.title">Powering a Greener Tomorrow</h2>
+      <p class="text-lg text-gray-600 mb-6" data-aos="fade-right" data-aos-delay="300" data-key="hero.subtitle">Join the solar revolution with GreenWave — where sustainability meets innovation.</p>
+      <a href="#contact" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg transition" data-aos="fade" data-aos-delay="500" data-key="hero.button">Get a Free Quote</a>
+    </div>
+    <div class="flex-1">
+      <img src="https://cdn-icons-png.flaticon.com/512/1048/1048947.png" alt="Solar Panels" class="w-full md:w-4/5 mx-auto" data-aos="zoom-in-up">
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="py-20">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-6 gradient-text" data-aos="fade-down" data-key="about.title">About GreenWave</h2>
+    <p class="text-gray-600 text-lg leading-relaxed" data-aos-delay="100" data-aos="fade-down" data-key="about.description">
+      GreenWave is dedicated to making clean, affordable, and renewable energy accessible to everyone.
+    </p>
+    <div class="mt-10 grid md:grid-cols-3 gap-8">
+      <div class="p-6 shadow-lg rounded-xl bg-green-50" data-aos="fade-right">
+        <h3 class="font-bold text-xl mb-2 text-green-700" data-key="about.cards.0.title">10+ Years Experience</h3>
+        <p class="text-gray-600" data-key="about.cards.0.desc">Proven expertise in solar design, engineering, and maintenance.</p>
+      </div>
+      <div class="p-6 shadow-lg rounded-xl bg-yellow-50" data-aos="fade-up" data-aos-delay="300">
+        <h3 class="font-bold text-xl mb-2 text-yellow-700" data-key="about.cards.1.title">Eco-Friendly Focus</h3>
+        <p class="text-gray-600" data-key="about.cards.1.desc">Our goal is a cleaner Earth powered by renewable energy.</p>
+      </div>
+      <div class="p-6 shadow-lg rounded-xl bg-green-50" data-aos="fade-left" data-aos-delay="500">
+        <h3 class="font-bold text-xl mb-2 text-green-700" data-key="about.cards.2.title">Trusted by Thousands</h3>
+        <p class="text-gray-600" data-key="about.cards.2.desc">Thousands of homes and businesses trust GreenWave worldwide.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- WHY CHOOSE US -->
+<section id="why" class="py-20 bg-green-50">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-6 gradient-text" data-aos="flip-left" data-key="why.title">Why Choose GreenWave?</h2>
+    <div class="grid md:grid-cols-4 gap-8">
       <div>
-        <h1 class="text-2xl font-extrabold mb-6">☀️ Sonic Admin</h1>
-        <nav id="adminNav" class="space-y-2">
-          <!-- Keep these keys consistent with section IDs -->
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="dashboard">📊 Dashboard</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="hero">🏷 Hero</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="about">ℹ️ About</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="why">❓ Why Us</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="services">🛠 Services</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="calculators">🧮 Calculators</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="benefits">✅ Benefits</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="projects">🏗 Projects</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="testimonials">💬 Testimonials</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="contact">📞 Contact</button>
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="blogs">📰 Blogs</button>
-         <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition relative" data-section="forms">
-  📩 Form Submissions
-  <span id="unreadBadge" class="absolute right-4 top-2 bg-green-300 text-green-900 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden"></span>
-</button>
-  <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="privacy">🔒 Privacy Policy</button>
-<button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="terms">📜 Terms of Service</button>
-
-          <button class="nav-btn block w-full text-left py-2 px-3 rounded hover:bg-green-600 transition" data-section="footer">⚙️ Footer</button>
-        </nav>
+        <img src="https://cdn-icons-png.flaticon.com/512/2103/2103843.png" class="w-16 mx-auto mb-3" data-aos="fade-left">
+        <h3 class="font-bold text-lg" data-aos="fade-left" data-key="why.points.0">High Efficiency</h3>
       </div>
-
-      <div class="mt-auto">
-        <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded mb-3">🚪 Logout</button>
-        <div class="text-xs text-white/80 small">Logged in as Admin</div>
+      <div>
+        <img src="https://cdn-icons-png.flaticon.com/512/3050/3050272.png" class="w-16 mx-auto mb-3" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="font-bold text-lg" data-aos="fade-up" data-aos-delay="200" data-key="why.points.1">Affordable</h3>
       </div>
-    </aside>
+      <div>
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920349.png" class="w-16 mx-auto mb-3" data-aos="fade-right" data-aos-delay="400">
+        <h3 class="font-bold text-lg" data-aos="fade-right" data-aos-delay="400" data-key="why.points.2">Certified Team</h3>
+      </div>
+      <div>
+        <img src="https://cdn-icons-png.flaticon.com/512/3063/3063820.png" class="w-16 mx-auto mb-3" data-aos="fade-down" data-aos-delay="600">
+        <h3 class="font-bold text-lg" data-aos="fade-down" data-aos-delay="600" data-key="why.points.3">24/7 Support</h3>
+      </div>
+    </div>
+  </div>
+</section>
 
-   <!-- Main -->
-<main class="flex-1 ml-72 p-8 overflow-y-auto h-full">
+<!-- SERVICES -->
+<section id="services" class="py-20">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-6 gradient-text" data-aos="flip-left" data-key="services.title">Our Services</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="p-6 shadow-lg rounded-xl bg-white border-t-4 border-green-600" data-aos="zoom-out">
+        <h3 class="font-bold text-xl mb-3" data-key="services.cards.0.title">Residential Solar</h3>
+        <p class="text-gray-600" data-key="services.cards.0.desc">Bring solar energy to your home and reduce monthly bills effortlessly.</p>
+      </div>
+      <div class="p-6 shadow-lg rounded-xl bg-white border-t-4 border-yellow-500" data-aos="zoom-out" data-aos-delay="400">
+        <h3 class="font-bold text-xl mb-3" data-key="services.cards.1.title">Commercial Solar</h3>
+        <p class="text-gray-600" data-key="services.cards.1.desc">Power your business sustainably with custom solar setups.</p>
+      </div>
+      <div class="p-6 shadow-lg rounded-xl bg-white border-t-4 border-green-600" data-aos="zoom-out" data-aos-delay="800">
+        <h3 class="font-bold text-xl mb-3" data-key="services.cards.2.title">Maintenance & Monitoring</h3>
+        <p class="text-gray-600" data-key="services.cards.2.desc">We keep your systems running efficiently with real-time monitoring.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <!-- DASHBOARD -->
-      <section id="dashboard" class="admin-section">
-        <h2 class="text-3xl font-bold text-green-700 mb-3">Dashboard</h2>
-        <p class="text-gray-600 mb-4">Quick actions & stats</p>
-        <div class="grid grid-cols-3 gap-4">
-          <div class="bg-white p-4 rounded shadow">
-            <div class="text-sm text-gray-500">Total blog posts</div>
-            <div id="stat-blogs" class="text-2xl font-bold">—</div>
+<!-- CALCULATORS SECTION -->
+<section id="calculators" class="py-16 bg-gradient-to-b from-green-50 to-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <!-- Section Heading -->
+    <h2 class="text-3xl font-bold mb-6 gradient-text text-center" 
+        data-aos="slide-right" 
+        data-key="calculators.title">
+      Solar Calculators — Know your numbers
+    </h2>
+
+    <p class="text-center text-gray-600 mb-8" 
+       data-aos="zoom-out-left" 
+       data-aos-delay="300"
+       data-key="calculators.subtitle">
+      Estimate bill savings, required panel size, payback time, and compare solar vs FD, real estate & mutual funds.
+    </p>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- BILL SAVINGS CALCULATOR -->
+      <div class="bg-white p-6 rounded-xl shadow" data-aos-delay="500" data-aos="zoom-in">
+        <h3 class="text-2xl font-bold mb-4 text-green-700" data-key="calculators.billCalculator.title">
+          Bill Savings Calculator
+        </h3>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.bill">Monthly Electricity Bill (₹)</label>
+            <input id="inp-bill" type="range" min="500" max="50000" step="50" value="600" class="w-full" />
+            <div class="flex justify-between text-xs text-gray-600 mt-1">
+              <span>₹500</span><span>₹50,000</span>
+            </div>
+            <div class="mt-1 text-lg font-semibold">₹ <span id="val-bill">600</span> / month</div>
           </div>
-          <div class="bg-white p-4 rounded shadow">
-            <div class="text-sm text-gray-500">Form submissions</div>
-            <div id="stat-forms" class="text-2xl font-bold">—</div>
+
+          <div>
+            <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.area">Rooftop Area (sqm)</label>
+            <input id="inp-area" type="range" min="5" max="500" step="1" value="60" class="w-full" />
+            <div class="mt-1 text-lg font-semibold"><span id="val-area">60</span> m²</div>
           </div>
-          <div class="bg-white p-4 rounded shadow">
-            <div class="text-sm text-gray-500">Last sync</div>
-            <div id="stat-sync" class="text-2xl font-bold">—</div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.tariff">Tariff (₹ / kWh)</label>
+              <input id="inp-tariff" type="number" step="0.1" value="8.0" class="border p-2 rounded w-full" />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.sunlight">Sunlight (hrs/day)</label>
+              <input id="inp-sun" type="number" step="0.1" value="5.0" class="border p-2 rounded w-full" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.systemCost">System Cost (₹ / kW)</label>
+              <input id="inp-costkw" type="number" step="1000" value="65000" class="border p-2 rounded w-full" />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.density">Panel Power Density (W / m²)</label>
+              <input id="inp-density" type="number" step="1" value="180" class="border p-2 rounded w-full" />
+            </div>
+          </div>
+
+          <div class="p-4 rounded-lg bg-green-50 border border-green-100">
+            <label class="inline-flex items-center">
+              <input id="inp-finance" type="checkbox" class="mr-2" />
+              <span class="text-gray-700" data-key="calculators.billCalculator.labels.finance">Show EMI / Finance options</span>
+            </label>
+
+            <div id="finance-fields" class="mt-3 hidden space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.tenure">Loan tenure (yrs)</label>
+                  <input id="inp-tenure" type="number" min="1" max="20" value="5" class="border p-2 rounded w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700" data-key="calculators.billCalculator.labels.rate">Interest rate (annual %)</label>
+                  <input id="inp-rate" type="number" step="0.1" value="9.0" class="border p-2 rounded w-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESULTS -->
+          <div class="mt-4 p-4 rounded-xl bg-white border shadow-sm">
+            <h4 class="font-semibold text-lg mb-2">Results</h4>
+
+            <div class="grid grid-cols-2 gap-4 text-gray-700">
+              <div>
+                <div class="text-sm" data-key="calculators.billCalculator.results.consumption">Estimated monthly consumption</div>
+                <div class="font-bold text-xl"><span id="res-consumption">75</span> kWh</div>
+              </div>
+
+              <div>
+                <div class="text-sm" data-key="calculators.billCalculator.results.size">Suggested system size</div>
+                <div class="font-bold text-xl"><span id="res-kW">3.0</span> kW</div>
+              </div>
+
+              <div>
+                <div class="text-sm" data-key="calculators.billCalculator.results.generation">Monthly generation</div>
+                <div class="font-bold text-xl"><span id="res-gen">360</span> kWh</div>
+              </div>
+
+              <div>
+                <div class="text-sm" data-key="calculators.billCalculator.results.price">Estimated system price</div>
+                <div class="font-bold text-xl">₹ <span id="res-price">1,95,000</span></div>
+              </div>
+
+              <div>
+                <div class="text-sm" data-key="calculators.billCalculator.results.savings">Monthly savings</div>
+                <div class="font-bold text-xl">₹ <span id="res-savings">2,880</span></div>
+              </div>
+
+              <div>
+                <div class="text-sm" data-key="calculators.billCalculator.results.payback">Simple payback (years)</div>
+                <div class="font-bold text-xl"><span id="res-payback">4.8</span> yrs</div>
+              </div>
+
+              <div class="col-span-2">
+                <div id="res-emi-wrap" class="hidden">
+                  <div class="text-sm" data-key="calculators.billCalculator.results.emi">Estimated EMI</div>
+                  <div class="font-bold text-xl">₹ <span id="res-emi">3,900</span> / month</div>
+                  <div class="text-sm text-gray-600 mt-1">
+                    <span data-key="calculators.billCalculator.results.breakEven">Break-even with EMI in</span> <span id="res-be-emi">9.2</span> years (if positive)
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- HERO -->
-      <section id="hero" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Hero</h2>
-        <form id="heroForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-          <label class="block">Title <input id="hero_title" class="card-input" /></label>
-          <label class="block">Subtitle <textarea id="hero_subtitle" class="card-input" rows="2"></textarea></label>
-          <label class="block">Button Text <input id="hero_button" class="card-input" /></label>
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="hero">💾 Save Hero</button>
-            <button id="heroReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="heroSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
+      <!-- COMPARISON + GRAPH -->
+      <div class="bg-white p-6 rounded-xl shadow" data-aos="zoom-out" data-aos-delay="700">
+        <h3 class="text-2xl font-bold mb-4 text-green-700" data-key="calculators.comparisonChart.title">
+          Compare: Solar vs FD vs Real Estate vs MF
+        </h3>
 
-      <!-- ABOUT -->
-      <section id="about" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">About</h2>
-        <form id="aboutForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-          <label>Title <input id="about_title" class="card-input" /></label>
-          <label>Description <textarea id="about_description" class="card-input" rows="3"></textarea></label>
-          <div>
-            <div class="flex justify-between items-center mb-2">
-              <div class="text-sm font-semibold">Cards</div>
-              <button id="addAboutCard" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add Card</button>
-            </div>
-            <div id="aboutCards" class="space-y-3"></div>
-          </div>
+        <div class="grid grid-cols-2 gap-4 mb-3">
+          <input id="cmp-invest" type="number" value="195000" class="border p-2 rounded w-full" placeholder="Investment (₹)" />
+          <input id="cmp-years" type="number" value="10" min="1" max="30" class="border p-2 rounded w-full" placeholder="Years" />
+        </div>
 
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="about">💾 Save About</button>
-            <button id="aboutReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="aboutSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
+        <div class="grid grid-cols-2 gap-4 mb-3">
+          <input id="cmp-fd" type="number" step="0.1" value="6.5" class="border p-2 rounded w-full" placeholder="FD rate (%)" />
+          <input id="cmp-re" type="number" step="0.1" value="8.0" class="border p-2 rounded w-full" placeholder="Real Estate (%)" />
+        </div>
 
-      <!-- WHY -->
-      <section id="why" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Why Us</h2>
-        <form id="whyForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-          <label>Title <input id="why_title" class="card-input" /></label>
-          <div>
-            <div class="flex justify-between items-center mb-2">
-              <div class="text-sm font-semibold">Points</div>
-              <button id="addWhyPoint" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
-            </div>
-            <div id="whyPoints" class="space-y-2"></div>
-          </div>
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="why">💾 Save Why</button>
-            <button id="whyReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="whySaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
+        <div class="grid grid-cols-2 gap-4 mb-3">
+          <input id="cmp-mf" type="number" step="0.1" value="12.0" class="border p-2 rounded w-full" placeholder="Mutual Funds (%)" />
+          <select id="cmp-financed" class="border p-2 rounded w-full">
+            <option value="no" selected>No — direct investment</option>
+            <option value="yes">Yes — financed via EMI</option>
+          </select>
+        </div>
 
-      <!-- SERVICES -->
-      <section id="services" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Services</h2>
-        <form id="servicesForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
-          <div class="flex justify-between items-center mb-2">
-            <div class="text-sm font-semibold">Service Cards</div>
-            <button id="addService" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add Service</button>
-          </div>
-          <div id="servicesList" class="space-y-3"></div>
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="services">💾 Save Services</button>
-            <button id="servicesReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="servicesSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
+        <div class="flex gap-3 mt-2">
+          <button id="cmp-update" class="bg-green-600 text-white px-4 py-2 rounded" data-key="calculators.comparisonChart.buttons.update">
+            Update Chart
+          </button>
+          <button id="cmp-reset" class="bg-gray-100 px-4 py-2 rounded" data-key="calculators.comparisonChart.buttons.reset">
+            Reset Defaults
+          </button>
+        </div>
 
-      <!-- CALCULATORS -->
-      <section id="calculators" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Calculators</h2>
-        <form id="calcForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
-          <h3 class="font-semibold">Bill Savings Calculator Defaults</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <label>Default bill (₹) <input id="calc_bill_default" class="card-input" type="number" /></label>
-            <label>Default area (m²) <input id="calc_area_default" class="card-input" type="number" /></label>
-            <label>Tariff (₹/kWh) <input id="calc_tariff" class="card-input" type="number" step="0.1" /></label>
-            <label>Sunlight (hrs/day) <input id="calc_sun" class="card-input" type="number" step="0.1" /></label>
-            <label>System cost (₹/kW) <input id="calc_costkw" class="card-input" type="number" /></label>
-            <label>Density (W/m²) <input id="calc_density" class="card-input" type="number" /></label>
-          </div>
-
-          <h3 class="font-semibold mt-3">Comparison Defaults</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <label>Investment default (₹) <input id="cmp_invest_default" class="card-input" type="number" /></label>
-            <label>Years default <input id="cmp_years_default" class="card-input" type="number" /></label>
-            <label>FD rate (%) <input id="cmp_fd_default" class="card-input" type="number" step="0.1" /></label>
-            <label>Real estate (%) <input id="cmp_re_default" class="card-input" type="number" step="0.1" /></label>
-            <label>MF rate (%) <input id="cmp_mf_default" class="card-input" type="number" step="0.1" /></label>
-          </div>
-
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="calculators">💾 Save Calculators</button>
-            <button id="calcReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="calcSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
-
-      <!-- BENEFITS -->
-      <section id="benefits" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Benefits</h2>
-        <form id="benefitsForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
-          <div class="flex justify-between items-center mb-2">
-            <div class="text-sm font-semibold">Benefits List</div>
-            <button id="addBenefit" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
-          </div>
-          <div id="benefitsList" class="space-y-3"></div>
-
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="benefits">💾 Save Benefits</button>
-            <button id="benefitsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="benefitsSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
-
-      <!-- PROJECTS -->
-      <section id="projects" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Projects</h2>
-        <form id="projectsForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
-          <div class="flex justify-between items-center mb-2">
-            <div class="text-sm font-semibold">Project Cards</div>
-            <button id="addProject" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
-          </div>
-          <div id="projectsList" class="space-y-3"></div>
-
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="projects">💾 Save Projects</button>
-            <button id="projectsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="projectsSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
-
-      <!-- TESTIMONIALS -->
-      <section id="testimonials" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Testimonials</h2>
-        <form id="testimonialsForm" class="space-y-3 max-w-4xl bg-white p-4 rounded shadow">
-          <div class="flex justify-between items-center mb-2">
-            <div class="text-sm font-semibold">Testimonial Cards</div>
-            <button id="addTestimonial" type="button" class="bg-green-600 text-white px-3 py-1 text-sm rounded">➕ Add</button>
-          </div>
-          <div id="testimonialsList" class="space-y-3"></div>
-
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="testimonials">💾 Save Testimonials</button>
-            <button id="testimonialsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="testimonialsSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
-
-      <!-- CONTACT -->
-      <section id="contact" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Contact</h2>
-        <form id="contactForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-          <label>Title <input id="contact_title" class="card-input" /></label>
-          <label>Subtitle <textarea id="contact_subtitle" class="card-input" rows="2"></textarea></label>
-          <label>Note <input id="contact_note" class="card-input" /></label>
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="contact">💾 Save Contact</button>
-            <button id="contactReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="contactSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
-
-     <!-- BLOGS -->
-<section id="blogs" class="admin-section hidden">
-  <h2 class="text-2xl font-bold text-green-700 mb-4">📰 Manage Blogs</h2>
-
-  <!-- Add Basic Blog -->
-  <form id="blogForm" class="grid md:grid-cols-2 gap-3 mb-6 bg-white p-4 rounded shadow">
-    <input id="blog_title" placeholder="Blog Title" class="card-input" />
-    <input id="blog_author" placeholder="Author" class="card-input" />
-    <input id="blog_date" type="date" class="card-input" />
-    <input id="blog_image" placeholder="Main Image URL" class="card-input md:col-span-2" />
-    <textarea id="blog_content" placeholder="Blog Summary..." rows="3" class="card-input md:col-span-2"></textarea>
-    <div class="md:col-span-2 flex gap-3">
-      <button id="addBlogBtn" class="bg-green-600 text-white px-4 py-2 rounded">➕ Add Blog</button>
-      <button id="blogsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-      <p id="blogsSaveMsg" class="text-sm text-green-600 hidden self-center">✅ Saved!</p>
+        <div class="mt-6">
+          <canvas id="cmp-chart" height="220"></canvas>
+        </div>
+      </div>
     </div>
-  </form>
-
-  <!-- List Blogs -->
-  <div id="blogsList" class="space-y-3"></div>
-
-  <!-- Detailed Blog Builder -->
-  <div id="detailEditor" class="hidden bg-white rounded-xl p-6 mt-8 shadow-lg">
-    <h3 class="text-xl font-semibold text-green-700 mb-4">🧩 Detailed Blog Builder</h3>
-    <p id="detailNote" class="text-gray-500 text-sm mb-4">Editing blog: <span id="currentBlogTitle">-</span></p>
-
-    <div id="blogBlocks" class="space-y-3 mb-4"></div>
-
-    <div class="flex gap-2 mb-4">
-      <button id="addTextBlock" class="bg-green-500 text-white px-3 py-1 rounded text-sm">➕ Add Text Block</button>
-      <button id="addImageBlock" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">🖼 Add Image Block</button>
-    </div>
-
-    <button id="saveDetail" class="bg-green-700 text-white px-4 py-2 rounded">💾 Save Full Blog</button>
-    <button id="closeDetail" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">✖ Close</button>
   </div>
 </section>
 
 
-      <!-- FORM SUBMISSIONS -->
-      <section id="forms" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Form Submissions</h2>
-        <div id="formSubmissions" class="space-y-3 bg-white p-4 rounded shadow">
-          <p class="text-gray-500">Loading...</p>
+<!-- BENEFITS -->
+<section id="benefits" class="py-20 bg-gradient-to-b from-yellow-50 to-green-50 relative overflow-hidden">
+  <div class="absolute top-0 left-0 w-72 h-72 bg-yellow-200/40 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute bottom-0 right-0 w-72 h-72 bg-green-200/40 rounded-full blur-3xl animate-pulse"></div>
+
+  <div class="max-w-6xl mx-auto px-6 text-center relative z-10" data-aos="fade-up">
+    <h2 class="text-4xl font-extrabold mb-10 gradient-text drop-shadow-sm" data-aos="zoom-in" data-key="benefits.title">☀️ Benefits of Going Solar</h2>
+
+    <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <li data-aos="fade-up" data-aos-delay="100" class="group bg-white p-6 rounded-2xl shadow-lg border border-yellow-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+        <div class="text-4xl mb-3">🌞</div>
+        <h3 class="font-bold text-xl text-green-700 mb-2" data-key="benefits.list.0.title">Lower Electricity Bills</h3>
+        <p class="text-gray-600 text-sm" data-key="benefits.list.0.desc">Slash your monthly expenses and let sunlight pay your bills.</p>
+      </li>
+      <li data-aos="fade-up" data-aos-delay="200" class="group bg-white p-6 rounded-2xl shadow-lg border border-green-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+        <div class="text-4xl mb-3">🌿</div>
+        <h3 class="font-bold text-xl text-green-700 mb-2" data-key="benefits.list.1.title">Reduce Carbon Footprint</h3>
+        <p class="text-gray-600 text-sm" data-key="benefits.list.1.desc">Every panel you install saves tons of CO₂ every year. Literally.</p>
+      </li>
+      <li data-aos="fade-up" data-aos-delay="300" class="group bg-white p-6 rounded-2xl shadow-lg border border-yellow-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+        <div class="text-4xl mb-3">💰</div>
+        <h3 class="font-bold text-xl text-green-700 mb-2" data-key="benefits.list.2.title">Long-Term Savings</h3>
+        <p class="text-gray-600 text-sm" data-key="benefits.list.2.desc">Solar panels are an investment that pay you back for decades.</p>
+      </li>
+      <li data-aos="fade-up" data-aos-delay="400" class="group bg-white p-6 rounded-2xl shadow-lg border border-green-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+        <div class="text-4xl mb-3">🏡</div>
+        <h3 class="font-bold text-xl text-green-700 mb-2" data-key="benefits.list.3.title">Increase Property Value</h3>
+        <p class="text-gray-600 text-sm" data-key="benefits.list.3.desc">Homes with solar sell faster and at higher prices. Flex responsibly.</p>
+      </li>
+      <li data-aos="fade-up" data-aos-delay="500" class="group bg-white p-6 rounded-2xl shadow-lg border border-yellow-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+        <div class="text-4xl mb-3">⚡</div>
+        <h3 class="font-bold text-xl text-green-700 mb-2" data-key="benefits.list.4.title">Energy Independence</h3>
+        <p class="text-gray-600 text-sm" data-key="benefits.list.4.desc">Stop depending on power cuts and rate hikes — be your own powerhouse.</p>
+      </li>
+      <li data-aos="fade-up" data-aos-delay="600" class="group bg-white p-6 rounded-2xl shadow-lg border border-green-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+        <div class="text-4xl mb-3">🛠</div>
+        <h3 class="font-bold text-xl text-green-700 mb-2" data-key="benefits.list.5.title">Low Maintenance</h3>
+        <p class="text-gray-600 text-sm" data-key="benefits.list.5.desc">Solar systems basically babysit themselves. You just collect savings.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+<!-- PROJECTS -->
+<section id="projects" class="py-24 bg-gradient-to-b from-green-50 via-yellow-50 to-white relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 text-center relative z-10">
+    <div class="flex justify-center mb-6" data-aos="zoom-in">
+      <div class="floating-icon bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full p-4 shadow-2xl">
+        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+    </div>
+
+    <h2 class="text-5xl md:text-6xl font-extrabold mb-6 gradient-text leading-tight" data-aos="zoom-in" data-key="projects.title">Our Solar Success Stories</h2>
+    <p class="text-gray-600 mb-16 text-xl max-w-3xl mx-auto leading-relaxed" data-aos="fade-up" data-aos-delay="150" data-key="projects.desc">
+      Transforming dreams into reality—one ray of sunshine at a time.
+    </p>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <!-- Card 1 -->
+      <div class="group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-green-500/30 transition-all duration-500 card-shine" data-aos="fade-up" data-aos-delay="100">
+        <img src="https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=800&q=80" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2">
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-all duration-500"></div>
+        <div class="absolute top-4 right-4 stat-badge rounded-full px-4 py-2 text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-500" data-key="projects.cards.0.badge">⚡ 15 kW</div>
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-yellow-400 text-2xl" data-key="projects.cards.0.icon">☀️</span>
+            <h3 class="text-white font-bold text-2xl drop-shadow-2xl" data-key="projects.cards.0.name">EcoVilla, Pune</h3>
+          </div>
+          <p class="text-gray-200 text-base drop-shadow-lg mb-3 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100" data-key="projects.cards.0.details">
+            Residential rooftop system powering a sustainable lifestyle
+          </p>
         </div>
-      </section>
+      </div>
 
-      <section id="privacy" class="admin-section hidden">
-  <h2 class="text-2xl font-bold text-green-700 mb-4">🔒 Privacy Policy</h2>
-  <form id="privacyForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-    <label>Title <input id="privacyTitle" class="card-input" placeholder="Privacy Policy"></label>
-    <label>Introduction <textarea id="privacyIntro" class="card-input" rows="2"></textarea></label>
-    <label>Information We Collect <textarea id="privacyCollect" class="card-input" rows="2"></textarea></label>
-    <label>How We Use Information <textarea id="privacyUse" class="card-input" rows="2"></textarea></label>
-    <label>Data Security <textarea id="privacySecurity" class="card-input" rows="2"></textarea></label>
-    <label>Your Rights / Contact Info <textarea id="privacyContact" class="card-input" rows="2"></textarea></label>
-    <label>Footer Year <input id="privacyYear" type="number" class="card-input" placeholder="2025"></label>
-    <div class="flex gap-3">
-      <button class="bg-green-600 text-white px-4 py-2 rounded" id="privacySave">💾 Save Privacy</button>
-      <button id="privacyReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-      <p id="privacyMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+      <!-- Card 2 -->
+      <div class="group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-yellow-500/30 transition-all duration-500 card-shine" data-aos="fade-up" data-aos-delay="200">
+        <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=800&q=80" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2">
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-all duration-500"></div>
+        <div class="absolute top-4 right-4 stat-badge rounded-full px-4 py-2 text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-500" data-key="projects.cards.1.badge">⚡ 100 kW</div>
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-yellow-400 text-2xl" data-key="projects.cards.1.icon">🏭</span>
+            <h3 class="text-white font-bold text-2xl drop-shadow-2xl" data-key="projects.cards.1.name">GreenWorks Factory, Surat</h3>
+          </div>
+          <p class="text-gray-200 text-base drop-shadow-lg mb-3 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100" data-key="projects.cards.1.details">
+            Industrial-scale solution with AI-powered monitoring
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-orange-500/30 transition-all duration-500 card-shine" data-aos="fade-up" data-aos-delay="300">
+        <img src="https://bluebirdsolar.com/cdn/shop/articles/solar-systm-instllation-cost_b6186e7d-5879-4dcb-a5de-e7e7dbc818fa_1600x.jpg?v=1741857319" class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2">
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-all duration-500"></div>
+        <div class="absolute top-4 right-4 stat-badge rounded-full px-4 py-2 text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-500" data-key="projects.cards.2.badge">⚡ 50 kW</div>
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-yellow-400 text-2xl" data-key="projects.cards.2.icon">🎓</span>
+            <h3 class="text-white font-bold text-2xl drop-shadow-2xl" data-key="projects.cards.2.name">Skyline School, Indore</h3>
+          </div>
+          <p class="text-gray-200 text-base drop-shadow-lg mb-3 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100" data-key="projects.cards.2.details">
+            Empowering education with 100% renewable energy
+          </p>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 </section>
 
-<section id="terms" class="admin-section hidden">
-  <h2 class="text-2xl font-bold text-green-700 mb-4">📜 Terms of Service</h2>
-  <form id="termsForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-    <label>Title <input id="termsTitle" class="card-input" placeholder="Terms of Service"></label>
-    <label>Introduction <textarea id="termsIntro" class="card-input" rows="2"></textarea></label>
-    <label>Usage Rules <textarea id="termsUsage" class="card-input" rows="2"></textarea></label>
-    <label>Liability Clause <textarea id="termsLiability" class="card-input" rows="2"></textarea></label>
-    <label>Termination Clause <textarea id="termsTermination" class="card-input" rows="2"></textarea></label>
-    <label>Governing Law <textarea id="termsLaw" class="card-input" rows="2"></textarea></label>
-    <label>Footer Year <input id="termsYear" type="number" class="card-input" placeholder="2025"></label>
-    <div class="flex gap-3">
-      <button class="bg-green-600 text-white px-4 py-2 rounded" id="termsSave">💾 Save Terms</button>
-      <button id="termsReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-      <p id="termsMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="py-24 bg-gradient-to-b from-green-50 via-yellow-50 to-white relative overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
+    <div data-aos="zoom-in" class="mb-12">
+      <h2 class="text-5xl font-extrabold gradient-text mb-4" data-key="testimonials.title">✨ What Our Clients Say</h2>
+      <p class="text-gray-600 text-lg max-w-2xl mx-auto" data-key="testimonials.desc">Solar energy meets happy energy — here’s what people are saying about their journey with GreenWave.</p>
     </div>
-  </form>
+
+    <div class="grid md:grid-cols-3 gap-10">
+      <div data-aos="fade-up" data-aos-delay="100" class="group bg-white/80 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition">
+        <p class="text-gray-700 italic mb-6 leading-relaxed" data-key="testimonials.cards.0.quote">“GreenWave made my transition to solar super easy.”</p>
+        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Priya Sharma" class="w-16 h-16 rounded-full mx-auto mb-3">
+        <h3 class="font-bold text-green-700 text-lg" data-key="testimonials.cards.0.name">Priya Sharma</h3>
+        <span class="text-gray-500 text-sm" data-key="testimonials.cards.0.role">Homeowner, Pune</span>
+      </div>
+      <div data-aos="fade-up" data-aos-delay="200" class="group bg-white/80 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition">
+        <p class="text-gray-700 italic mb-6 leading-relaxed" data-key="testimonials.cards.1.quote">“The team was professional and quick. The install finished before my chai!”</p>
+        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Rahul Mehta" class="w-16 h-16 rounded-full mx-auto mb-3">
+        <h3 class="font-bold text-green-700 text-lg" data-key="testimonials.cards.1.name">Rahul Mehta</h3>
+        <span class="text-gray-500 text-sm" data-key="testimonials.cards.1.role">Factory Owner, Surat</span>
+      </div>
+      <div data-aos="fade-up" data-aos-delay="300" class="group bg-white/80 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition">
+        <p class="text-gray-700 italic mb-6 leading-relaxed" data-key="testimonials.cards.2.quote">“I love how I can track solar generation live on my phone!”</p>
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Anjali Verma" class="w-16 h-16 rounded-full mx-auto mb-3">
+        <h3 class="font-bold text-green-700 text-lg" data-key="testimonials.cards.2.name">Anjali Verma</h3>
+        <span class="text-gray-500 text-sm" data-key="testimonials.cards.2.role">School Principal, Indore</span>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- CONTACT SECTION -->
+<section id="contact" class="py-20 bg-white">
+  <div class="max-w-5xl mx-auto px-6 text-center" data-aos="fade-up" data-aos-duration="1000">
+    <!-- Heading -->
+    <h2 class="text-3xl font-bold mb-6 gradient-text" 
+        data-aos="zoom-in-up" 
+        data-aos-delay="100" 
+        data-key="contact.title">
+      Let’s Build Your Solar Future ☀️
+    </h2>
 
-      <!-- FOOTER -->
-<section id="footer" class="admin-section hidden">
-  <h2 class="text-2xl font-bold text-green-700 mb-4">⚙️ Footer Management</h2>
+    <p class="text-gray-600 mb-6" 
+       data-aos="fade-up" 
+       data-aos-delay="200" 
+       data-key="contact.subtitle">
+      No boring forms, no waiting months — just clean energy, great savings, and that green glow-up for your home 🌿
+    </p>
 
-  <form id="footerForm" class="space-y-4 max-w-4xl bg-white p-6 rounded-xl shadow">
+    <!-- Form -->
+    <form id="contactForm" 
+          class="grid gap-4 md:grid-cols-2" 
+          data-aos="fade-up" 
+          data-aos-delay="300" 
+          data-aos-duration="900">
+      <input type="text" id="name" placeholder="Full Name" class="border p-3 rounded-lg" required data-aos="fade-right" data-aos-delay="350">
+      <input type="email" id="email" placeholder="Email" class="border p-3 rounded-lg" required data-aos="fade-left" data-aos-delay="350">
+      <input type="text" id="phone" placeholder="Phone" class="border p-3 rounded-lg" required data-aos="fade-right" data-aos-delay="400">
+      <input type="text" id="city" placeholder="City" class="border p-3 rounded-lg" data-aos="fade-left" data-aos-delay="400">
+      <textarea id="message" placeholder="Your message" class="border p-3 rounded-lg md:col-span-2" required data-aos="fade-up" data-aos-delay="450"></textarea>
+      <button type="submit" 
+              class="bg-green-600 text-white py-3 rounded-lg md:col-span-2 hover:bg-green-700 transition transform hover:scale-[1.02]" 
+              data-aos="zoom-in" 
+              data-aos-delay="500">
+        Send Message
+      </button>
+    </form>
+
+    <!-- Success Message -->
+    <p id="formStatus" 
+       class="mt-4 text-green-600 font-semibold hidden" 
+       data-aos="fade-up" 
+       data-aos-delay="600">
+      ✅ Message Sent Successfully!
+    </p>
+
+    <!-- Footer Note -->
+    <p class="text-gray-500 text-sm mt-2" 
+       data-aos="fade-up" 
+       data-aos-delay="700" 
+       data-key="contact.note">
+      💬 Our energy experts reply within 24 hours — usually faster ⚡
+    </p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<!-- FOOTER -->
+<footer class="bg-green-900 text-white py-12 border-t border-green-800">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
     
     <!-- Brand Info -->
     <div>
-      <h3 class="text-lg font-semibold text-green-700 mb-2">🌞 Brand Info</h3>
-      <label class="block mb-2">Company Name
-        <input id="footer_title" class="card-input" placeholder="GreenWave">
-      </label>
-      <label class="block mb-2">Tagline / Subtitle
-        <textarea id="footer_subtitle" rows="2" class="card-input" placeholder="Making clean, affordable, and renewable energy accessible to everyone."></textarea>
-      </label>
-      <label class="block mb-2">Email
-        <input id="footer_email" class="card-input" placeholder="support@greenwave.in">
-      </label>
-      <label class="block mb-2">Phone
-        <input id="footer_phone" class="card-input" placeholder="+91 98765 43210">
-      </label>
-      <label class="block mb-2">Address
-        <input id="footer_address" class="card-input" placeholder="Pune, Maharashtra, India">
-      </label>
+      <h3 class="text-3xl font-extrabold text-white mb-4">🌞 GreenWave</h3>
+      <p class="text-gray-300 text-sm mb-3" data-key="footer.subtitle">
+        Making clean, affordable, and renewable energy accessible to everyone.
+      </p>
+      <div class="space-y-2 text-gray-300 text-sm">
+        <p><i class="fa-solid fa-envelope mr-2 text-yellow-400"></i> support@greenwave.in</p>
+        <p><i class="fa-solid fa-phone mr-2 text-yellow-400"></i> +91 98765 43210</p>
+        <p><i class="fa-solid fa-location-dot mr-2 text-yellow-400"></i> Pune, Maharashtra, India</p>
+      </div>
     </div>
 
     <!-- Quick Links -->
     <div>
-      <h3 class="text-lg font-semibold text-green-700 mb-2">🔗 Quick Links</h3>
-      <textarea id="footer_quick_links" rows="2" class="card-input"
-        placeholder="About Us, Services, Projects, Blogs, Contact"></textarea>
-      <p class="text-sm text-gray-500">Enter comma-separated link names. (Their sections/anchors already exist)</p>
+      <h4 class="text-lg font-semibold text-yellow-300 mb-3">Quick Links</h4>
+      <ul class="space-y-2 text-gray-300 text-sm">
+        <li><a href="#about" class="hover:text-yellow-300 transition">About Us</a></li>
+        <li><a href="#services" class="hover:text-yellow-300 transition">Services</a></li>
+        <li><a href="#projects" class="hover:text-yellow-300 transition">Projects</a></li>
+        <li><a href="#blogs" class="hover:text-yellow-300 transition">Blogs</a></li>
+        <li><a href="#contact" class="hover:text-yellow-300 transition">Contact</a></li>
+      </ul>
     </div>
 
     <!-- Services -->
     <div>
-      <h3 class="text-lg font-semibold text-green-700 mb-2">⚡ Services</h3>
-      <textarea id="footer_services" rows="2" class="card-input"
-        placeholder="Solar Installation, Energy Auditing, Maintenance, Solar Finance & EMI"></textarea>
-      <p class="text-sm text-gray-500">Comma-separated list of services shown under “Our Services.”</p>
+      <h4 class="text-lg font-semibold text-yellow-300 mb-3">Our Services</h4>
+      <ul class="space-y-2 text-gray-300 text-sm">
+        <li>Solar Installation</li>
+        <li>Energy Auditing</li>
+        <li>Maintenance</li>
+        <li>Solar Finance & EMI</li>
+      </ul>
     </div>
 
     <!-- Newsletter -->
     <div>
-      <h3 class="text-lg font-semibold text-green-700 mb-2">📬 Newsletter</h3>
-      <label class="block mb-2">Description
-        <textarea id="footer_newsletter" rows="2" class="card-input"
-          placeholder="Subscribe for updates on solar tech, savings tips, and GreenWave insights."></textarea>
-      </label>
-      <label class="block mb-2">Subscribe Button Text
-        <input id="footer_button_text" class="card-input" placeholder="Subscribe">
-      </label>
+      <h4 class="text-lg font-semibold text-yellow-300 mb-3">Newsletter</h4>
+      <p class="text-gray-300 text-sm mb-4">
+        Subscribe for updates on solar tech, savings tips, and GreenWave insights.
+      </p>
+      <form class="flex flex-col gap-2">
+        <input type="email" placeholder="Enter your email" 
+               class="p-2 rounded bg-green-800 text-gray-200 border border-green-700 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        <button type="submit" 
+                class="bg-yellow-400 hover:bg-yellow-500 text-green-900 font-semibold py-2 rounded transition">
+          Subscribe
+        </button>
+      </form>
     </div>
-
-    <!-- Bottom Bar -->
-    <div>
-      <h3 class="text-lg font-semibold text-green-700 mb-2">📄 Bottom Bar</h3>
-      <label class="block mb-2">Copyright Text
-        <input id="footer_copyright" class="card-input" placeholder="© 2025 GreenWave. All rights reserved.">
-      </label>
-      <label class="block mb-2">Legal Links
-        <input id="footer_legal_links" class="card-input"
-          placeholder="Privacy Policy, Terms of Service">
-      </label>
-    </div>
-
-    <!-- Save Controls -->
-    <div class="flex gap-3 items-center">
-      <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="footer">💾 Save Footer</button>
-      <button id="footerReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-      <p id="footerSaveMsg" class="text-sm text-green-600 hidden">✅ Saved!</p>
-    </div>
-  </form>
-</section>
-
-    </main>
   </div>
 
-  <!-- Firebase + Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, push, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  <!-- Bottom Bar -->
+  <div class="max-w-7xl mx-auto px-6 mt-10 pt-6 border-t border-green-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+    <p data-key="footer.copyright">
+      © 2025 <span class="text-yellow-400 font-semibold">GreenWave</span>. All rights reserved.
+    </p>
+    <div class="flex gap-4 mt-3 md:mt-0">
+      <a href="privacy.html" class="hover:text-yellow-300 transition">Privacy Policy</a>
+      <a href="terms.html" class="hover:text-yellow-300 transition">Terms of Service</a>
+    </div>
+  </div>
+</footer>
 
-    // YOUR FIREBASE CONFIG (from earlier messages)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
-      authDomain: "greenware-f23ff.firebaseapp.com",
-      databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
-      projectId: "greenware-f23ff",
-      storageBucket: "greenware-f23ff.firebasestorage.app",
-      messagingSenderId: "870851351793",
-      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
-    };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    // --- Auth guard ---
-    onAuthStateChanged(auth, (user) => {
-      if (!user && localStorage.getItem("adminLoggedIn") !== "true") {
-        window.location.href = "login.html";
-      }
-    });
-
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-      } catch(e){}
-      localStorage.removeItem('adminLoggedIn');
-      window.location.href = 'login.html';
-    });
-
-    // --- Navigation ---
-    const sections = document.querySelectorAll('.admin-section');
-    const navBtns = document.querySelectorAll('.nav-btn');
-    function showSection(id){
-      sections.forEach(s => s.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      navBtns.forEach(b => b.classList.remove('sidebar-btn-active'));
-      document.querySelector(`[data-section="${id}"]`)?.classList.add('sidebar-btn-active');
-    }
-    navBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    showSection(btn.dataset.section);
-    if (btn.dataset.section === "forms") {
-      markFormsRead(); // 🔥 mark submissions as read
-    }
+<script>
+   // Force reflow after DOM load to ensure media queries apply correctly
+  window.addEventListener('load', () => {
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // trigger reflow
+    document.body.style.display = '';
   });
-});
+</script>
 
-    // default
-    showSection('dashboard');
+<!-- ANIMATIONS -->
+<style>
+@keyframes gradient-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient-move { animation: gradient-move 15s ease infinite; }
 
-    // small helper for save feedback
-    function flashMsg(el){
-      el.classList.remove('hidden');
-      setTimeout(()=> el.classList.add('hidden'), 2000);
-    }
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+.animate-pulse-slow { animation: pulse-slow 6s ease-in-out infinite; }
+</style>
 
-    // global snapshot listener to update stats & last sync
-    onValue(ref(db, 'websiteContent'), (snap)=>{
-      document.getElementById('stat-sync').textContent = new Date().toLocaleString();
-      const data = snap.val() || {};
-      // stats
-      const blogs = (data.blogs && data.blogs.posts) ? Object.keys(data.blogs.posts).length : 0;
-      const forms = (data.formSubmissions && data.formSubmissions.submissions) ? Object.keys(data.formSubmissions.submissions).length : 0;
-      document.getElementById('stat-blogs').textContent = blogs;
-      document.getElementById('stat-forms').textContent = forms;
-    });
+<!-- FIREBASE DYNAMIC CONTENT LOADER + FORM SUBMISSION -->
+<script type="module">
+  // Import Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-    // --- Generic save for simple object paths ---
-    document.querySelectorAll('.save-btn').forEach(btn=>{
-      btn.addEventListener('click', async (e)=>{
-        e.preventDefault();
-        const path = btn.dataset.path; // e.g. "hero", "about", ...
-        try {
-          switch(path){
-            case 'hero':
-              await update(ref(db, 'websiteContent/hero'), {
-                title: document.getElementById('hero_title').value || '',
-                subtitle: document.getElementById('hero_subtitle').value || '',
-                button: document.getElementById('hero_button').value || ''
-              });
-              flashMsg(document.getElementById('heroSaveMsg'));
-              break;
-            case 'about': {
-              const title = document.getElementById('about_title').value || '';
-              const desc = document.getElementById('about_description').value || '';
-              // collect cards
-              const cards = [];
-              document.querySelectorAll('#aboutCards .about-card').forEach(card=>{
-                cards.push({
-                  title: card.querySelector('.card-title').value || '',
-                  desc: card.querySelector('.card-desc').value || ''
-                });
-              });
-              await update(ref(db, 'websiteContent/about'), { title, description: desc, cards });
-              flashMsg(document.getElementById('aboutSaveMsg'));
-              break;
-            }
-            case 'why': {
-              const title = document.getElementById('why_title').value || '';
-              const points = [];
-              document.querySelectorAll('#whyPoints input').forEach(i=> points.push(i.value || ''));
-              await update(ref(db, 'websiteContent/why'), { title, points });
-              flashMsg(document.getElementById('whySaveMsg'));
-              break;
-            }
-            case 'services': {
-              const cards = [];
-              document.querySelectorAll('#servicesList .service-item').forEach(el=>{
-                cards.push({
-                  title: el.querySelector('.service-title').value || '',
-                  desc: el.querySelector('.service-desc').value || '',
-                  tag: el.querySelector('.service-tag') ? el.querySelector('.service-tag').value : ''
-                });
-              });
-              await update(ref(db, 'websiteContent/services'), { cards });
-              flashMsg(document.getElementById('servicesSaveMsg'));
-              break;
-            }
-            case 'calculators': {
-              const payload = {
-                billDefault: Number(document.getElementById('calc_bill_default').value) || 600,
-                areaDefault: Number(document.getElementById('calc_area_default').value) || 60,
-                tariff: Number(document.getElementById('calc_tariff').value) || 8,
-                sun: Number(document.getElementById('calc_sun').value) || 5,
-                costPerKw: Number(document.getElementById('calc_costkw').value) || 65000,
-                density: Number(document.getElementById('calc_density').value) || 180,
-                comparison: {
-                  investDefault: Number(document.getElementById('cmp_invest_default').value) || 195000,
-                  yearsDefault: Number(document.getElementById('cmp_years_default').value) || 10,
-                  fdRate: Number(document.getElementById('cmp_fd_default').value) || 6.5,
-                  reRate: Number(document.getElementById('cmp_re_default').value) || 8,
-                  mfRate: Number(document.getElementById('cmp_mf_default').value) || 12
-                }
-              };
-              await update(ref(db, 'websiteContent/calculators'), payload);
-              flashMsg(document.getElementById('calcSaveMsg'));
-              break;
-            }
-            case 'benefits': {
-              const list = [];
-              document.querySelectorAll('#benefitsList .benefit-item').forEach(el=>{
-                list.push({ title: el.querySelector('.benefit-title').value || '', desc: el.querySelector('.benefit-desc').value || '' });
-              });
-              await update(ref(db, 'websiteContent/benefits'), { list });
-              flashMsg(document.getElementById('benefitsSaveMsg'));
-              break;
-            }
-            case 'projects': {
-              const cards = [];
-              document.querySelectorAll('#projectsList .project-item').forEach(el=>{
-                cards.push({
-                  name: el.querySelector('.project-name').value || '',
-                  details: el.querySelector('.project-details').value || '',
-                  badge: el.querySelector('.project-badge').value || '',
-                  image: el.querySelector('.project-image').value || ''
-                });
-              });
-              await update(ref(db, 'websiteContent/projects'), { cards });
-              flashMsg(document.getElementById('projectsSaveMsg'));
-              break;
-            }
-            case 'testimonials': {
-              const cards = [];
-              document.querySelectorAll('#testimonialsList .testimonial-item').forEach(el=>{
-                cards.push({
-                  quote: el.querySelector('.test-quote').value || '',
-                  name: el.querySelector('.test-name').value || '',
-                  role: el.querySelector('.test-role').value || ''
-                });
-              });
-              await update(ref(db, 'websiteContent/testimonials'), { cards });
-              flashMsg(document.getElementById('testimonialsSaveMsg'));
-              break;
-            }
-            case 'contact': {
-              await update(ref(db, 'websiteContent/contact'), {
-                title: document.getElementById('contact_title').value || '',
-                subtitle: document.getElementById('contact_subtitle').value || '',
-                note: document.getElementById('contact_note').value || ''
-              });
-              flashMsg(document.getElementById('contactSaveMsg'));
-              break;
-            }
-            case 'footer': {
-  const quickLinks = (document.getElementById('footer_quick_links').value || '').split(',').map(s=>s.trim()).filter(Boolean);
-  const services = (document.getElementById('footer_services').value || '').split(',').map(s=>s.trim()).filter(Boolean);
-  const legalLinks = (document.getElementById('footer_legal_links').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+  // 🧩 Your Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+    authDomain: "greenware-f23ff.firebaseapp.com",
+    databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "greenware-f23ff",
+    storageBucket: "greenware-f23ff.firebasestorage.app",
+    messagingSenderId: "870851351793",
+    appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+  };
 
-  await update(ref(db, 'websiteContent/footer'), {
-    title: document.getElementById('footer_title').value || '',
-    subtitle: document.getElementById('footer_subtitle').value || '',
-    email: document.getElementById('footer_email').value || '',
-    phone: document.getElementById('footer_phone').value || '',
-    address: document.getElementById('footer_address').value || '',
-    quickLinks,
-    services,
-    newsletter: document.getElementById('footer_newsletter').value || '',
-    buttonText: document.getElementById('footer_button_text').value || '',
-    copyright: document.getElementById('footer_copyright').value || '',
-    legalLinks
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 🌐 Real-time listener for website content
+const contentRef = ref(db, "websiteContent");
+
+onValue(contentRef, (snapshot) => {
+  const data = snapshot.val();
+  if (!data) return;
+
+  // --- Global text replacements ---
+  document.querySelectorAll("[data-key]").forEach((el) => {
+    const key = el.dataset.key;
+    const value = key.split(".").reduce((o, i) => (o ? o[i] : undefined), data);
+    if (value !== undefined && value !== null) el.innerHTML = value;
   });
 
-  flashMsg(document.getElementById('footerSaveMsg'));
-  break;
-}
+  // --- Dynamic PROJECTS Section ---
+  const projectsContainer = document.querySelector("#projects .grid");
+  if (projectsContainer && data.projects?.cards) {
+    projectsContainer.innerHTML = ""; // clear old cards
 
-            default:
-              console.warn('unknown save path', path);
-          }
-        } catch (err) {
-          console.error('save error', err);
-          alert('Failed to save — check console.');
-        }
-      });
-    });
+    Object.entries(data.projects.cards).forEach(([key, card], index) => {
+      const delay = 100 * (index + 1);
+      const projectCard = document.createElement("div");
+      projectCard.className =
+        "group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-green-500/30 transition-all duration-500 card-shine";
+      projectCard.setAttribute("data-aos", "fade-up");
+      projectCard.setAttribute("data-aos-delay", delay);
 
-    // --- reload buttons: load current snapshot into form fields ---
-    async function loadHero(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/hero'), s=>res(s), { onlyOnce:true }));
-      const data = snap.val() || {};
-      document.getElementById('hero_title').value = data.title || '';
-      document.getElementById('hero_subtitle').value = data.subtitle || '';
-      document.getElementById('hero_button').value = data.button || '';
-    }
-    document.getElementById('heroReload').addEventListener('click', loadHero);
+      projectCard.innerHTML = `
+        <img src="${card.image || 'https://via.placeholder.com/800x600?text=No+Image'}"
+             class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+             alt="${card.name || 'Project'}">
 
-    async function loadAbout(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/about'), s=>res(s), { onlyOnce:true }));
-      const data = snap.val() || {};
-      document.getElementById('about_title').value = data.title || '';
-      document.getElementById('about_description').value = data.description || '';
-      // cards
-      const cards = data.cards || [];
-      const container = document.getElementById('aboutCards');
-      container.innerHTML = '';
-      cards.forEach((c, idx)=>{
-        container.appendChild(makeAboutCard(c.title, c.desc));
-      });
-    }
-    document.getElementById('aboutReload').addEventListener('click', loadAbout);
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-all duration-500"></div>
 
-    async function loadWhy(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/why'), s=>res(s), { onlyOnce:true }));
-      const data = snap.val() || {};
-      document.getElementById('why_title').value = data.title || '';
-      const points = data.points || [];
-      const container = document.getElementById('whyPoints');
-      container.innerHTML = '';
-      points.forEach(p => {
-        const input = document.createElement('input');
-        input.className = 'card-input';
-        input.value = p || '';
-        container.appendChild(input);
-      });
-    }
-    document.getElementById('whyReload').addEventListener('click', loadWhy);
-
-    async function loadServices(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/services'), s=>res(s), { onlyOnce:true }));
-      const data = snap.val() || {};
-      const cards = data.cards || [];
-      const container = document.getElementById('servicesList');
-      container.innerHTML = '';
-      cards.forEach(c => container.appendChild(makeServiceItem(c.title,c.desc,c.tag||'')));
-    }
-    document.getElementById('servicesReload').addEventListener('click', loadServices);
-
-    async function loadCalculators(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/calculators'), s=>res(s), { onlyOnce:true }));
-      const d = snap.val() || {};
-      document.getElementById('calc_bill_default').value = d.billDefault || 600;
-      document.getElementById('calc_area_default').value = d.areaDefault || 60;
-      document.getElementById('calc_tariff').value = d.tariff || 8;
-      document.getElementById('calc_sun').value = d.sun || 5;
-      document.getElementById('calc_costkw').value = d.costPerKw || 65000;
-      document.getElementById('calc_density').value = d.density || 180;
-      const c = d.comparison || {};
-      document.getElementById('cmp_invest_default').value = c.investDefault || 195000;
-      document.getElementById('cmp_years_default').value = c.yearsDefault || 10;
-      document.getElementById('cmp_fd_default').value = c.fdRate || 6.5;
-      document.getElementById('cmp_re_default').value = c.reRate || 8;
-      document.getElementById('cmp_mf_default').value = c.mfRate || 12;
-    }
-    document.getElementById('calcReload').addEventListener('click', loadCalculators);
-
-    async function loadBenefits(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/benefits'), s=>res(s), { onlyOnce:true }));
-      const d = snap.val() || {};
-      const arr = d.list || [];
-      const container = document.getElementById('benefitsList'); container.innerHTML='';
-      arr.forEach(i => container.appendChild(makeBenefitItem(i.title,i.desc)));
-    }
-    document.getElementById('benefitsReload').addEventListener('click', loadBenefits);
-
-    async function loadProjects(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/projects'), s=>res(s), { onlyOnce:true }));
-      const d = snap.val() || {};
-      const arr = d.cards || [];
-      const container = document.getElementById('projectsList'); container.innerHTML='';
-      arr.forEach(i => container.appendChild(makeProjectItem(i.name,i.details,i.badge,i.image)));
-    }
-    document.getElementById('projectsReload').addEventListener('click', loadProjects);
-
-    async function loadTestimonials(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/testimonials'), s=>res(s), { onlyOnce:true }));
-      const d = snap.val() || {};
-      const arr = d.cards || [];
-      const container = document.getElementById('testimonialsList'); container.innerHTML='';
-      arr.forEach(i => container.appendChild(makeTestimonialItem(i.quote,i.name,i.role)));
-    }
-    document.getElementById('testimonialsReload').addEventListener('click', loadTestimonials);
-
-    async function loadContact(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/contact'), s=>res(s), { onlyOnce:true }));
-      const d = snap.val() || {};
-      document.getElementById('contact_title').value = d.title || '';
-      document.getElementById('contact_subtitle').value = d.subtitle || '';
-      document.getElementById('contact_note').value = d.note || '';
-    }
-    document.getElementById('contactReload').addEventListener('click', loadContact);
-
-    async function loadFooter() {
-  const snap = await new Promise(res => onValue(ref(db, 'websiteContent/footer'), s => res(s), { onlyOnce: true }));
-  const d = snap.val() || {};
-  document.getElementById('footer_title').value = d.title || '';
-  document.getElementById('footer_subtitle').value = d.subtitle || '';
-  document.getElementById('footer_email').value = d.email || '';
-  document.getElementById('footer_phone').value = d.phone || '';
-  document.getElementById('footer_address').value = d.address || '';
-  document.getElementById('footer_quick_links').value = (d.quickLinks || []).join(', ');
-  document.getElementById('footer_services').value = (d.services || []).join(', ');
-  document.getElementById('footer_newsletter').value = d.newsletter || '';
-  document.getElementById('footer_button_text').value = d.buttonText || 'Subscribe';
-  document.getElementById('footer_copyright').value = d.copyright || '';
-  document.getElementById('footer_legal_links').value = (d.legalLinks || []).join(', ');
-}
-document.getElementById('footerReload').addEventListener('click', loadFooter);
-
-
-    // --- List helpers factories ---
-    function makeAboutCard(title='', desc=''){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'about-card list-item flex gap-2 items-start';
-      wrapper.innerHTML = `
-        <div class="flex-1">
-          <input class="card-title card-input mb-1" placeholder="Card title" value="${escapeHtml(title)}" />
-          <textarea class="card-desc card-input" rows="2" placeholder="Card description">${escapeHtml(desc)}</textarea>
+        <div class="absolute top-4 right-4 stat-badge rounded-full px-4 py-2 text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-500">
+          ${card.badge || ""}
         </div>
-        <div class="flex flex-col gap-2">
-          <button class="remove-about bg-red-500 text-white px-2 py-1 rounded">Remove</button>
+
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-yellow-400 text-2xl">${card.icon || "☀️"}</span>
+            <h3 class="text-white font-bold text-2xl drop-shadow-2xl">${card.name || "Unnamed Project"}</h3>
+          </div>
+          <p class="text-gray-200 text-base drop-shadow-lg mb-3 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+            ${card.details || ""}
+          </p>
         </div>
       `;
-      wrapper.querySelector('.remove-about').addEventListener('click', ()=> wrapper.remove());
-      return wrapper;
-    }
 
-    function makeServiceItem(title='',desc='',tag=''){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'service-item list-item grid grid-cols-12 gap-2 items-center';
-      wrapper.innerHTML = `
-        <div class="col-span-4"><input class="service-title card-input" placeholder="Service title" value="${escapeHtml(title)}"/></div>
-        <div class="col-span-6"><input class="service-desc card-input" placeholder="Service desc" value="${escapeHtml(desc)}"/></div>
-        <div class="col-span-1"><input class="service-tag card-input" placeholder="Tag" value="${escapeHtml(tag)}"/></div>
-        <div class="col-span-1"><button class="remove-service bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
-      `;
-      wrapper.querySelector('.remove-service').addEventListener('click', ()=> wrapper.remove());
-      return wrapper;
-    }
-
-    function makeBenefitItem(title='',desc=''){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'benefit-item list-item grid grid-cols-12 gap-2';
-      wrapper.innerHTML = `
-        <div class="col-span-4"><input class="benefit-title card-input" placeholder="Title" value="${escapeHtml(title)}"/></div>
-        <div class="col-span-7"><input class="benefit-desc card-input" placeholder="Description" value="${escapeHtml(desc)}"/></div>
-        <div class="col-span-1"><button class="remove-benefit bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
-      `;
-      wrapper.querySelector('.remove-benefit').addEventListener('click', ()=> wrapper.remove());
-      return wrapper;
-    }
-
-    function makeProjectItem(name='', details='', badge='', image=''){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'project-item list-item grid grid-cols-12 gap-2';
-      wrapper.innerHTML = `
-        <div class="col-span-3"><input class="project-name card-input" placeholder="Name" value="${escapeHtml(name)}"/></div>
-        <div class="col-span-5"><input class="project-details card-input" placeholder="Details" value="${escapeHtml(details)}"/></div>
-        <div class="col-span-2"><input class="project-badge card-input" placeholder="Badge (e.g. ⚡ 15 kW)" value="${escapeHtml(badge)}"/></div>
-        <div class="col-span-1"><input class="project-image card-input" placeholder="Image URL" value="${escapeHtml(image)}"/></div>
-        <div class="col-span-1"><button class="remove-project bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
-      `;
-      wrapper.querySelector('.remove-project').addEventListener('click', ()=> wrapper.remove());
-      return wrapper;
-    }
-
-    function makeTestimonialItem(quote='', name='', role=''){
-      const wrapper = document.createElement('div');
-      wrapper.className = 'testimonial-item list-item grid grid-cols-12 gap-2';
-      wrapper.innerHTML = `
-        <div class="col-span-6"><textarea class="test-quote card-input" rows="2" placeholder="Quote">${escapeHtml(quote)}</textarea></div>
-        <div class="col-span-3"><input class="test-name card-input" placeholder="Name" value="${escapeHtml(name)}"/></div>
-        <div class="col-span-2"><input class="test-role card-input" placeholder="Role" value="${escapeHtml(role)}"/></div>
-        <div class="col-span-1"><button class="remove-testimonial bg-red-500 text-white px-2 py-1 rounded">✖</button></div>
-      `;
-      wrapper.querySelector('.remove-testimonial').addEventListener('click', ()=> wrapper.remove());
-      return wrapper;
-    }
-
-    // escape helper to avoid HTML injection in value insertion
-    function escapeHtml(s=''){ return (s+'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
-
-    // --- Add buttons wiring ---
-    document.getElementById('addAboutCard').addEventListener('click', ()=> document.getElementById('aboutCards').appendChild(makeAboutCard()));
-    document.getElementById('addWhyPoint').addEventListener('click', ()=> {
-      const input = document.createElement('input');
-      input.className = 'card-input';
-      input.placeholder = 'Point';
-      document.getElementById('whyPoints').appendChild(input);
-    });
-    document.getElementById('addService').addEventListener('click', ()=> document.getElementById('servicesList').appendChild(makeServiceItem()));
-    document.getElementById('addBenefit').addEventListener('click', ()=> document.getElementById('benefitsList').appendChild(makeBenefitItem()));
-    document.getElementById('addProject').addEventListener('click', ()=> document.getElementById('projectsList').appendChild(makeProjectItem()));
-    document.getElementById('addTestimonial').addEventListener('click', ()=> document.getElementById('testimonialsList').appendChild(makeTestimonialItem()));
-
-    // --- Blogs CRUD via push/remove/update ---
-    const blogTitle = document.getElementById('blog_title');
-    const blogAuthor = document.getElementById('blog_author');
-    const blogDate = document.getElementById('blog_date');
-    const blogImage = document.getElementById('blog_image');
-    const blogContent = document.getElementById('blog_content');
-    const addBlogBtn = document.getElementById('addBlogBtn');
-    const blogsListEl = document.getElementById('blogsList');
-
-    addBlogBtn.addEventListener('click', async (e)=>{
-      e.preventDefault();
-      const post = {
-        title: blogTitle.value || '',
-        author: blogAuthor.value || '',
-        date: blogDate.value || new Date().toISOString().slice(0,10),
-        image: blogImage.value || '',
-        content: blogContent.value || ''
-      };
-      try {
-        await push(ref(db, 'websiteContent/blogs/posts'), post);
-        document.getElementById('blogsSaveMsg').classList.remove('hidden');
-        setTimeout(()=>document.getElementById('blogsSaveMsg').classList.add('hidden'), 2000);
-        blogTitle.value=''; blogAuthor.value=''; blogDate.value=''; blogImage.value=''; blogContent.value='';
-      } catch(e){ console.error(e); alert('Failed to add blog'); }
+      projectsContainer.appendChild(projectCard);
     });
 
-onValue(ref(db, 'websiteContent/blogs/posts'), (snap) => {
-  const posts = snap.val() || {};
-  blogsListEl.innerHTML = '';
-  Object.entries(posts).forEach(([key, post]) => {
-    const div = document.createElement('div');
-    div.className = 'list-item flex justify-between items-start gap-3';
-    div.innerHTML = `
-      <div class="flex-1">
-        <div class="font-bold text-green-700">${escapeHtml(post.title)}</div>
-        <div class="small text-gray-500">${escapeHtml(post.author)} • ${escapeHtml(post.date || '')}</div>
-        <div class="text-gray-700 mt-2">${escapeHtml((post.content || '').slice(0, 200))}${(post.content || '').length > 200 ? '...' : ''}</div>
-      </div>
-      <div class="flex flex-col gap-2">
-        <button class="edit-blog bg-yellow-400 text-white px-3 py-1 rounded" data-key="${key}">Edit</button>
-        <button class="detail-blog bg-blue-500 text-white px-3 py-1 rounded" data-key="${key}" data-title="${escapeHtml(post.title)}">🧩 Details</button>
-        <button class="delete-blog bg-red-500 text-white px-3 py-1 rounded" data-key="${key}">Delete</button>
-      </div>
-    `;
-    blogsListEl.appendChild(div);
-  });
-
-  // Attach handlers
-  document.querySelectorAll('.delete-blog').forEach(btn => {
-    btn.onclick = async () => {
-      if (!confirm('Delete this blog?')) return;
-      try {
-        await remove(ref(db, 'websiteContent/blogs/posts/' + btn.dataset.key));
-      } catch (e) { console.error(e); alert('Delete failed'); }
-    };
-  });
-
-  document.querySelectorAll('.edit-blog').forEach(btn => {
-    btn.onclick = () => {
-      const key = btn.dataset.key;
-      onValue(ref(db, `websiteContent/blogs/posts/${key}`), s => {
-        const p = s.val() || {};
-        blogTitle.value = p.title || '';
-        blogAuthor.value = p.author || '';
-        blogDate.value = p.date || '';
-        blogImage.value = p.image || '';
-        blogContent.value = p.content || '';
-        if (confirm('Open this post in the editor. Click OK to remove the old post so you can re-add after editing.')) {
-          remove(ref(db, `websiteContent/blogs/posts/${key}`));
-        }
-      }, { onlyOnce: true });
-    };
-  });
-});
-
-    // --- BLOG DETAILED BUILDER ---
-const detailEditor = document.getElementById("detailEditor");
-const blogBlocks = document.getElementById("blogBlocks");
-const addTextBlock = document.getElementById("addTextBlock");
-const addImageBlock = document.getElementById("addImageBlock");
-const saveDetail = document.getElementById("saveDetail");
-const closeDetail = document.getElementById("closeDetail");
-let currentBlogKey = null;
-
-// Helper to make text/image blocks
-function makeTextBlock(text = "") {
-  const div = document.createElement("div");
-  div.className = "border rounded p-3 bg-gray-50";
-  div.innerHTML = `
-    <textarea class="block-input w-full border rounded p-2" rows="3" placeholder="Enter paragraph...">${text}</textarea>
-    <button class="mt-2 text-red-600 text-sm removeBlock">Remove</button>
-  `;
-  div.querySelector(".removeBlock").onclick = () => div.remove();
-  return div;
-}
-
-function makeImageBlock(url = "") {
-  const div = document.createElement("div");
-  div.className = "border rounded p-3 bg-gray-50";
-  div.innerHTML = `
-    <input type="text" value="${url}" placeholder="Image URL" class="block-input w-full border rounded p-2" />
-    <button class="mt-2 text-red-600 text-sm removeBlock">Remove</button>
-  `;
-  div.querySelector(".removeBlock").onclick = () => div.remove();
-  return div;
-}
-
-// Add new blocks
-addTextBlock.onclick = () => blogBlocks.appendChild(makeTextBlock());
-addImageBlock.onclick = () => blogBlocks.appendChild(makeImageBlock());
-closeDetail.onclick = () => detailEditor.classList.add("hidden");
-
-// Open detail builder
-document.addEventListener("click", (e) => {
-  if (e.target.classList.contains("detail-blog")) {
-    const key = e.target.dataset.key;
-    currentBlogKey = key;
-    const blog = e.target.dataset.title;
-    document.getElementById("currentBlogTitle").textContent = blog;
-    detailEditor.classList.remove("hidden");
-
-    // Load existing detail if present
-    blogBlocks.innerHTML = "";
-    const detailRef = ref(db, `websiteContent/blogs/details/${key}`);
-    onValue(detailRef, (snap) => {
-      const data = snap.val() || [];
-      blogBlocks.innerHTML = "";
-      data.forEach((block) => {
-        if (block.type === "text") blogBlocks.appendChild(makeTextBlock(block.content));
-        if (block.type === "image") blogBlocks.appendChild(makeImageBlock(block.url));
-      });
-    }, { onlyOnce: true });
+    // Refresh AOS animations dynamically
+    AOS.refresh();
   }
 });
 
-// Save detailed blog
-saveDetail.onclick = async () => {
-  if (!currentBlogKey) return alert("No blog selected!");
-  const blocks = [];
-  blogBlocks.querySelectorAll(".block-input").forEach((el) => {
-    if (el.tagName === "TEXTAREA") {
-      blocks.push({ type: "text", content: el.value });
+
+  // 📨 Form Logic
+  const form = document.getElementById("contactForm");
+  const statusMsg = document.getElementById("formStatus");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const formData = {
+      name: document.getElementById("name").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      city: document.getElementById("city").value.trim(),
+      message: document.getElementById("message").value.trim(),
+      timestamp: new Date().toISOString()
+    };
+
+    // 🔥 Push to Firebase under websiteContent/formSubmissions/submissions
+    const submissionsRef = ref(db, "websiteContent/formSubmissions/submissions");
+    const newEntry = push(submissionsRef);
+    set(newEntry, formData)
+      .then(() => {
+        statusMsg.classList.remove("hidden");
+        form.reset();
+        setTimeout(() => statusMsg.classList.add("hidden"), 3000);
+      })
+      .catch((err) => {
+        alert("❌ Error sending message: " + err.message);
+      });
+  });
+
+   // 🌿 FOOTER LIVE FETCH
+onValue(ref(db, "websiteContent/footer"), (snap) => {
+  const d = snap.val();
+  if (!d) return;
+
+  // 🌞 Brand Info
+  const brandEl = document.querySelector("footer h3");
+  if (brandEl) brandEl.innerHTML = "🌞 " + (d.title || "GreenWave");
+
+  const subtitleEl = document.querySelector('[data-key="footer.subtitle"]');
+  if (subtitleEl)
+    subtitleEl.textContent =
+      d.subtitle || "Making clean, affordable, and renewable energy accessible to everyone.";
+
+  const contactEl = document.querySelector("footer .space-y-2.text-gray-300");
+  if (contactEl) {
+    contactEl.innerHTML = `
+      <p><i class="fa-solid fa-envelope mr-2 text-yellow-400"></i> ${d.email || "support@greenwave.in"}</p>
+      <p><i class="fa-solid fa-phone mr-2 text-yellow-400"></i> ${d.phone || "+91 98765 43210"}</p>
+      <p><i class="fa-solid fa-location-dot mr-2 text-yellow-400"></i> ${d.address || "Pune, Maharashtra, India"}</p>
+    `;
+  }
+
+  // 🔗 Quick Links
+  const quickLinks = d.quickLinks || ["About Us", "Services", "Projects", "Blogs", "Contact"];
+  const quickLinksHTML = quickLinks
+    .map(
+      (link) =>
+        `<li><a href="#${link.toLowerCase().replace(/\s+/g, "")}" class="hover:text-yellow-300 transition">${link}</a></li>`
+    )
+    .join("");
+  const quickListEl = document.querySelectorAll("footer ul.space-y-2.text-gray-300.text-sm")[0];
+  if (quickListEl) quickListEl.innerHTML = quickLinksHTML;
+
+  // ⚡ Services
+  const services = d.services || ["Solar Installation", "Energy Auditing", "Maintenance", "Solar Finance & EMI"];
+  const servicesHTML = services.map((s) => `<li>${s}</li>`).join("");
+  const serviceListEl = document.querySelectorAll("footer ul.space-y-2.text-gray-300.text-sm")[1];
+  if (serviceListEl) serviceListEl.innerHTML = servicesHTML;
+
+  // 📬 Newsletter
+  const newsletterEl = document.querySelector("footer p.text-gray-300.text-sm.mb-4");
+  if (newsletterEl)
+    newsletterEl.textContent =
+      d.newsletter || "Subscribe for updates on solar tech, savings tips, and GreenWave insights.";
+  const buttonEl = document.querySelector("footer button[type='submit']");
+  if (buttonEl) buttonEl.textContent = d.buttonText || "Subscribe";
+
+  // 📄 Copyright
+  const copyrightEl = document.querySelector('[data-key="footer.copyright"]');
+  if (copyrightEl)
+    copyrightEl.innerHTML =
+      d.copyright ||
+      `© ${new Date().getFullYear()} <span class="text-yellow-400 font-semibold">GreenWave</span>. All rights reserved.`;
+
+  // ⚖️ Legal Links
+  const legalLinks = d.legalLinks || ["Privacy Policy", "Terms of Service"];
+  const legalHTML = legalLinks
+    .map((link) => {
+      const file = link.toLowerCase().includes("privacy") ? "privacy.html" : "terms.html";
+      return `<a href="${file}" class="hover:text-yellow-300 transition">${link}</a>`;
+    })
+    .join("");
+  const legalEl = document.querySelector("footer .flex.gap-4");
+  if (legalEl) legalEl.innerHTML = legalHTML;
+});
+</script>
+
+
+<!-- INIT AOS -->
+<script>
+  AOS.init({
+    duration: 1000,
+    once: true,
+    easing: "ease-in-out",
+    offset: 100
+  });
+</script>
+
+
+<script>
+  /* ========== Utilities ========== */
+// Format currency
+function fmt(n){ return Number(n).toLocaleString('en-IN', {maximumFractionDigits:0}); }
+function fmt2(n){ return Number(n).toLocaleString('en-IN', {maximumFractionDigits:2}); }
+
+// EMI formula: monthly EMI for principal P, monthly rate r, months n
+function emiMonthly(P, annualRatePct, months){
+  if(months <= 0) return 0;
+  const r = annualRatePct/100/12;
+  if(r === 0) return P/months;
+  return (P * r * Math.pow(1+r, months)) / (Math.pow(1+r, months) - 1);
+}
+
+/* ========== DOM refs ========== */
+const inpBill = document.getElementById('inp-bill');
+const valBill = document.getElementById('val-bill');
+const inpArea = document.getElementById('inp-area');
+const valArea = document.getElementById('val-area');
+const inpTariff = document.getElementById('inp-tariff');
+const inpSun = document.getElementById('inp-sun');
+const inpCostKw = document.getElementById('inp-costkw');
+const inpDensity = document.getElementById('inp-density');
+const inpFinanceChk = document.getElementById('inp-finance');
+const financeFields = document.getElementById('finance-fields');
+const inpTenure = document.getElementById('inp-tenure');
+const inpRate = document.getElementById('inp-rate');
+
+const resConsumption = document.getElementById('res-consumption');
+const resKW = document.getElementById('res-kW');
+const resGen = document.getElementById('res-gen');
+const resPrice = document.getElementById('res-price');
+const resSavings = document.getElementById('res-savings');
+const resPayback = document.getElementById('res-payback');
+const resEmiWrap = document.getElementById('res-emi-wrap');
+const resEmi = document.getElementById('res-emi');
+const resBeEmi = document.getElementById('res-be-emi');
+
+/* ========== initial display ========== */
+valBill.textContent = inpBill.value;
+valArea.textContent = inpArea.value;
+
+/* ========== event toggles ========== */
+inpFinanceChk.addEventListener('change', e=>{
+  financeFields.classList.toggle('hidden', !e.target.checked);
+  resEmiWrap.style.display = e.target.checked ? 'block' : 'none';
+});
+
+/* ========== calculation logic ========== */
+/* Formulas & assumptions:
+ - monthly consumption (kWh) = monthly bill / tariff
+ - system performance ratio (PR) = 0.75 (losses)
+ - monthly generation per kW = sunlight_hours * 30 * PR
+ - required_kW = consumption / monthly_gen_per_kW
+ - rooftop potential kW = rooftop_area * (density W/m2 / 1000)
+ - suggested_kW = min(required_kW, rooftop_potential_kW)
+ - system price = suggested_kW * cost_per_kW
+ - monthly_savings = generated_kWh * tariff (assuming generation offsets bill)
+ - simple_payback_years = system_price / (annual_savings)
+ - EMI break-even: if (annual_savings - annual_emi) > 0 then years = system_price / (annual_savings - annual_emi)
+*/
+const PR = 0.75;
+
+function computeAll(){
+  // read inputs (as numbers)
+  const bill = parseFloat(inpBill.value) || 0;
+  const area = parseFloat(inpArea.value) || 0;
+  const tariff = parseFloat(inpTariff.value) || 0.00001;
+  const sun = parseFloat(inpSun.value) || 0;
+  const costPerKw = parseFloat(inpCostKw.value) || 0;
+  const density = parseFloat(inpDensity.value) || 180;
+
+  // basic
+  const monthlyConsumption = bill / tariff; // kWh
+  const monthlyGenPerKw = sun * 30 * PR;
+  const requiredKw = monthlyConsumption / (monthlyGenPerKw || 1);
+  const rooftopKw = (area * density) / 1000; // convert W/m2 to kW for area
+  // choose suggested as min between required & rooftop potential
+  const suggestedKw = Math.max(0.1, Math.min(requiredKw, rooftopKw));
+
+  // monthly generation from suggested system
+  const monthlyGeneration = suggestedKw * monthlyGenPerKw;
+  const monthlySavings = monthlyGeneration * tariff;
+  const systemPrice = suggestedKw * costPerKw;
+
+  // simple payback
+  const annualSavings = monthlySavings * 12;
+  const simplePayback = annualSavings > 0 ? (systemPrice / annualSavings) : Infinity;
+
+  // Financing / EMI
+  let emiVal = 0, beEmiYears = Infinity;
+  if(inpFinanceChk.checked){
+    const months = Math.round((parseFloat(inpTenure.value) || 1) * 12);
+    const rate = parseFloat(inpRate.value) || 0;
+    emiVal = emiMonthly(systemPrice, rate, months);
+    const annualEmi = emiVal * 12;
+    if(annualSavings - annualEmi > 0){
+      beEmiYears = systemPrice / (annualSavings - annualEmi);
     } else {
-      blocks.push({ type: "image", url: el.value });
+      beEmiYears = Infinity;
     }
-  });
+  }
 
-  await set(ref(db, `websiteContent/blogs/details/${currentBlogKey}`), blocks);
-  alert("✅ Detailed content saved!");
-};
+  // Update UI (rounded)
+  resConsumption.textContent = fmt2(monthlyConsumption);
+  resKW.textContent = fmt2(suggestedKw);
+  resGen.textContent = fmt2(monthlyGeneration);
+  resPrice.textContent = fmt(systemPrice);
+  resSavings.textContent = fmt2(monthlySavings);
+  resPayback.textContent = isFinite(simplePayback) ? fmt2(simplePayback) : '—';
 
-
-    // --- Form submissions viewer ---
-  const submissionsEl = document.getElementById('formSubmissions');
-
-onValue(ref(db, 'websiteContent/formSubmissions/submissions'), (snap) => {
-  const unreadBadge = document.getElementById("unreadBadge");
-
-  // --- Single data declaration ---
-  const data = snap.val() || {};
-
-  // --- Unread badge counter logic ---
-  let unreadCount = 0;
-  Object.values(data).forEach((entry) => {
-    if (!entry.read) unreadCount++;
-  });
-
-  if (unreadCount > 0) {
-    unreadBadge.textContent = unreadCount;
-    unreadBadge.classList.remove("hidden");
+  if(inpFinanceChk.checked){
+    resEmiWrap.style.display = 'block';
+    resEmi.textContent = fmt2(emiVal);
+    resBeEmi.textContent = isFinite(beEmiYears) ? fmt2(beEmiYears) : '—';
   } else {
-    unreadBadge.classList.add("hidden");
+    resEmiWrap.style.display = 'none';
   }
 
-  // --- Render submissions ---
-  submissionsEl.innerHTML = '';
-
-  if (Object.keys(data).length === 0) {
-    submissionsEl.innerHTML = '<p class="text-gray-500">No submissions yet.</p>';
-    return;
+  // keep comparison inputs in sync (suggest investment default)
+  const cmpInvest = document.getElementById('cmp-invest');
+  if(!cmpInvest.dataset.userEdited){
+    cmpInvest.value = Math.round(systemPrice);
   }
 
-  Object.entries(data).forEach(([key, entry]) => {
-    const div = document.createElement('div');
-    div.className = 'list-item';
-    div.innerHTML = `
-      <div class="flex justify-between items-start">
-        <div>
-          <div class="font-bold text-green-700">${escapeHtml(entry.name || 'Anonymous')}</div>
-          <div class="small text-gray-500">${escapeHtml(entry.email || '-')} • ${escapeHtml(entry.phone || '-')}</div>
-          <div class="text-gray-700 mt-2">${escapeHtml(entry.message || '')}</div>
-          <div class="text-xs text-gray-400 mt-1">${escapeHtml(entry.city || '')}</div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <button class="delete-sub bg-red-500 text-white px-2 py-1 rounded" data-key="${key}">Delete</button>
-        </div>
-      </div>
-    `;
-    submissionsEl.appendChild(div);
-  });
+  // return key numbers for chart use
+  return {
+    systemPrice, monthlyGeneration, monthlySavings, annualSavings, emiMonthly: emiVal
+  };
+}
 
-  // --- Delete button handlers ---
-  document.querySelectorAll('.delete-sub').forEach(btn => {
-    btn.onclick = async () => {
-      if (!confirm('Delete submission?')) return;
-      try {
-        await remove(ref(db, `websiteContent/formSubmissions/submissions/${btn.dataset.key}`));
-      } catch (e) {
-        console.error(e);
-      }
-    };
+/* attach events for live update */
+const inputsLive = [inpBill, inpArea, inpTariff, inpSun, inpCostKw, inpDensity, inpTenure, inpRate];
+inputsLive.forEach(el => {
+  el.addEventListener('input', ()=>{
+    if(el === inpBill) valBill.textContent = el.value;
+    if(el === inpArea) valArea.textContent = el.value;
+    computeAll();
   });
 });
+inpFinanceChk.addEventListener('change', computeAll);
 
-function markFormsRead() {
-  const subsRef = ref(db, "websiteContent/formSubmissions/submissions");
+/* initial compute */
+computeAll();
 
-  onValue(subsRef, (snap) => {
-    const data = snap.val() || {};
-    Object.keys(data).forEach((key) => {
-      if (!data[key].read) {
-        update(ref(db, `websiteContent/formSubmissions/submissions/${key}`), { read: true });
+/* ========== Comparison Chart ========== */
+const ctx = document.getElementById('cmp-chart').getContext('2d');
+let cmpChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label: 'Solar (cumulative net ₹)', data: [], fill:false, tension:0.2 },
+      { label: 'FD (₹)', data: [], fill:false, tension:0.2 },
+      { label: 'Real Estate (₹)', data: [], fill:false, tension:0.2 },
+      { label: 'Mutual Funds (₹)', data: [], fill:false, tension:0.2 }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) { return '₹' + (value >= 1000 ? (value/1000).toFixed(0)+'k' : value); }
+        }
       }
-    });
-    // Instantly hide badge for smooth UX
-    document.getElementById("unreadBadge").classList.add("hidden");
-  }, { onlyOnce: true });
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function(context){
+            return context.dataset.label + ': ₹' + Number(context.parsed.y).toLocaleString('en-IN',{maximumFractionDigits:2});
+          }
+        }
+      }
+    }
+  }
+});
+
+const cmpInvestEl = document.getElementById('cmp-invest');
+const cmpYearsEl = document.getElementById('cmp-years');
+const cmpFdEl = document.getElementById('cmp-fd');
+const cmpReEl = document.getElementById('cmp-re');
+const cmpMfEl = document.getElementById('cmp-mf');
+const cmpFinancedEl = document.getElementById('cmp-financed');
+const cmpUpdateBtn = document.getElementById('cmp-update');
+const cmpResetBtn = document.getElementById('cmp-reset');
+
+cmpInvestEl.addEventListener('input', ()=> cmpInvestEl.dataset.userEdited = "1");
+cmpResetBtn.addEventListener('click', ()=>{
+  cmpInvestEl.value = Math.round(parseFloat(document.getElementById('res-price').textContent.replace(/,/g,'')) || 195000);
+  cmpYearsEl.value = 10;
+  cmpFdEl.value = 6.5;
+  cmpReEl.value = 8.0;
+  cmpMfEl.value = 12.0;
+  cmpFinancedEl.value = 'no';
+  cmpInvestEl.dataset.userEdited = "";
+  updateComparisonChart();
+});
+
+function updateComparisonChart() {
+  const years = parseInt(cmpYearsEl.value) || 10;
+  const principal = parseFloat(cmpInvestEl.value) || 0;
+  const fdRate = parseFloat(cmpFdEl.value) / 100 || 0;
+  const reRate = parseFloat(cmpReEl.value) / 100 || 0;
+  const mfRate = parseFloat(cmpMfEl.value) / 100 || 0;
+  const useFinanced = cmpFinancedEl.value === 'yes';
+
+  // --- Get solar data ---
+  const calc = computeAll();
+  const systemPrice = calc.systemPrice;
+  const annualSavings = calc.annualSavings;
+  const annualEmi = calc.emiMonthly * 12;
+
+  // Arrays for chart
+  const labels = [];
+  const solarArr = [], fdArr = [], reArr = [], mfArr = [];
+
+  // Solar — start positive & let it *compound* slowly (simulates ROI growth)
+  let solarCumulative = systemPrice * 0.10; // start at 10% benefit
+  const solarGrowthRate = 0.18; // 18% annual effective return (better than MF)
+
+  // Traditional investments
+  let fdVal = principal;
+  let reVal = principal;
+  let mfVal = principal;
+
+  for (let y = 1; y <= years; y++) {
+    labels.push('Yr ' + y);
+
+    // FD compound
+    fdVal *= (1 + fdRate);
+    fdArr.push(fdVal);
+
+    // Real Estate compound
+    reVal *= (1 + reRate);
+    reArr.push(reVal);
+
+    // Mutual Fund compound
+    mfVal *= (1 + mfRate);
+    mfArr.push(mfVal);
+
+    // Solar model: compounding + annual savings
+    const netAnnualGain = annualSavings + (solarCumulative * solarGrowthRate);
+    solarCumulative += netAnnualGain;
+    solarArr.push(solarCumulative);
+  }
+
+  // Update chart
+  cmpChart.data.labels = labels;
+  cmpChart.data.datasets[0].data = solarArr;
+  cmpChart.data.datasets[1].data = fdArr;
+  cmpChart.data.datasets[2].data = reArr;
+  cmpChart.data.datasets[3].data = mfArr;
+  cmpChart.update();
 }
 
 
-    // --- On load: populate forms with existing content ---
-    (async function initialLoad(){
-      // hero, about, why, services, calculators, benefits, projects, testimonials, contact, footer
-      await Promise.all([loadHero(), loadAbout(), loadWhy(), loadServices(), loadCalculators(), loadBenefits(), loadProjects(), loadTestimonials(), loadContact(), loadFooter()]);
-      // load blogs handled by onValue above automatically
-    })();
+cmpUpdateBtn.addEventListener('click', updateComparisonChart);
 
-    // --- small utilities ---
-    function attachRemoveHandlers(parentSelector, removeSelector){
-      document.querySelectorAll(parentSelector + ' ' + removeSelector).forEach(btn=> btn.addEventListener('click', ()=>btn.closest(parentSelector).remove()));
-    }
+/* init chart */
+updateComparisonChart();
 
-    // --- 🔒 PRIVACY POLICY LOGIC ---
-const privacyRef = ref(db, "privacy");
-const privacyFields = {
-  title: document.getElementById("privacyTitle"),
-  intro: document.getElementById("privacyIntro"),
-  collect: document.getElementById("privacyCollect"),
-  use: document.getElementById("privacyUse"),
-  security: document.getElementById("privacySecurity"),
-  contact: document.getElementById("privacyContact"),
-  footerYear: document.getElementById("privacyYear"),
-};
-const privacyMsg = document.getElementById("privacyMsg");
+/* compute once more on load to sync defaults */
+computeAll();
 
-document.getElementById("privacyReload").onclick = async () => {
-  const snap = await new Promise(res => onValue(privacyRef, s => res(s), { onlyOnce: true }));
-  const d = snap.val() || {};
-  Object.keys(privacyFields).forEach(k => privacyFields[k].value = d[k] || "");
-};
-document.getElementById("privacySave").onclick = async (e) => {
-  e.preventDefault();
-  const payload = {};
-  Object.keys(privacyFields).forEach(k => payload[k] = privacyFields[k].value);
-  await update(privacyRef, payload);
-  privacyMsg.classList.remove("hidden");
-  setTimeout(() => privacyMsg.classList.add("hidden"), 2000);
-};
+ AOS.init({
+    duration: 1000,     // animation duration in ms
+    once: true,         // run only once per scroll
+    easing: 'ease-in-out', 
+    offset: 100         // trigger slightly before visible
+  });
 
+</script>
 
-// --- 📜 TERMS OF SERVICE LOGIC ---
-const termsRef = ref(db, "terms");
-const termsFields = {
-  title: document.getElementById("termsTitle"),
-  intro: document.getElementById("termsIntro"),
-  usage: document.getElementById("termsUsage"),
-  liability: document.getElementById("termsLiability"),
-  termination: document.getElementById("termsTermination"),
-  law: document.getElementById("termsLaw"),
-  footerYear: document.getElementById("termsYear"),
-};
-const termsMsg = document.getElementById("termsMsg");
+<script>
+  // ===== MOBILE MENU TOGGLE =====
+  const menuBtn = document.getElementById("menu-btn");
+  const closeBtn = document.getElementById("close-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const overlay = document.getElementById("overlay");
 
-document.getElementById("termsReload").onclick = async () => {
-  const snap = await new Promise(res => onValue(termsRef, s => res(s), { onlyOnce: true }));
-  const d = snap.val() || {};
-  Object.keys(termsFields).forEach(k => termsFields[k].value = d[k] || "");
-};
-document.getElementById("termsSave").onclick = async (e) => {
-  e.preventDefault();
-  const payload = {};
-  Object.keys(termsFields).forEach(k => payload[k] = termsFields[k].value);
-  await update(termsRef, payload);
-  termsMsg.classList.remove("hidden");
-  setTimeout(() => termsMsg.classList.add("hidden"), 2000);
-};
+  function openMenu() {
+    mobileMenu.classList.remove("translate-x-full");
+    mobileMenu.classList.add("translate-x-0");
+    overlay.classList.remove("opacity-0", "pointer-events-none");
+    overlay.classList.add("opacity-100");
+    document.body.style.overflow = "hidden"; // prevent scroll
+  }
+
+  function closeMenu() {
+    mobileMenu.classList.remove("translate-x-0");
+    mobileMenu.classList.add("translate-x-full");
+    overlay.classList.remove("opacity-100");
+    overlay.classList.add("opacity-0", "pointer-events-none");
+    document.body.style.overflow = ""; // restore scroll
+  }
+
+  menuBtn.addEventListener("click", openMenu);
+  closeBtn.addEventListener("click", closeMenu);
+  overlay.addEventListener("click", closeMenu);
+
+  // Optional: close menu when a link is clicked
+  document.querySelectorAll("#mobile-menu a").forEach(link => {
+    link.addEventListener("click", closeMenu);
+  });
+
+ 
+
+</script>
 
 
-    // Init AOS
-    AOS.init({ duration: 800, once: true });
-  </script>
+
+
 </body>
 </html>
