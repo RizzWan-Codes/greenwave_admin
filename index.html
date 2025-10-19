@@ -334,20 +334,80 @@
 
 
       <!-- FOOTER -->
-      <section id="footer" class="admin-section hidden">
-        <h2 class="text-2xl font-bold text-green-700 mb-4">Footer</h2>
-        <form id="footerForm" class="space-y-3 max-w-3xl bg-white p-4 rounded shadow">
-          <label>Title <input id="footer_title" class="card-input" /></label>
-          <label>Subtitle <input id="footer_subtitle" class="card-input" /></label>
-          <label>Links (comma separated) <input id="footer_links" class="card-input" /></label>
-          <label>Copyright <input id="footer_copyright" class="card-input" /></label>
-          <div class="flex gap-3">
-            <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="footer">💾 Save Footer</button>
-            <button id="footerReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
-            <p id="footerSaveMsg" class="text-sm text-green-600 hidden self-center">Saved ✓</p>
-          </div>
-        </form>
-      </section>
+<section id="footer" class="admin-section hidden">
+  <h2 class="text-2xl font-bold text-green-700 mb-4">⚙️ Footer Management</h2>
+
+  <form id="footerForm" class="space-y-4 max-w-4xl bg-white p-6 rounded-xl shadow">
+    
+    <!-- Brand Info -->
+    <div>
+      <h3 class="text-lg font-semibold text-green-700 mb-2">🌞 Brand Info</h3>
+      <label class="block mb-2">Company Name
+        <input id="footer_title" class="card-input" placeholder="GreenWave">
+      </label>
+      <label class="block mb-2">Tagline / Subtitle
+        <textarea id="footer_subtitle" rows="2" class="card-input" placeholder="Making clean, affordable, and renewable energy accessible to everyone."></textarea>
+      </label>
+      <label class="block mb-2">Email
+        <input id="footer_email" class="card-input" placeholder="support@greenwave.in">
+      </label>
+      <label class="block mb-2">Phone
+        <input id="footer_phone" class="card-input" placeholder="+91 98765 43210">
+      </label>
+      <label class="block mb-2">Address
+        <input id="footer_address" class="card-input" placeholder="Pune, Maharashtra, India">
+      </label>
+    </div>
+
+    <!-- Quick Links -->
+    <div>
+      <h3 class="text-lg font-semibold text-green-700 mb-2">🔗 Quick Links</h3>
+      <textarea id="footer_quick_links" rows="2" class="card-input"
+        placeholder="About Us, Services, Projects, Blogs, Contact"></textarea>
+      <p class="text-sm text-gray-500">Enter comma-separated link names. (Their sections/anchors already exist)</p>
+    </div>
+
+    <!-- Services -->
+    <div>
+      <h3 class="text-lg font-semibold text-green-700 mb-2">⚡ Services</h3>
+      <textarea id="footer_services" rows="2" class="card-input"
+        placeholder="Solar Installation, Energy Auditing, Maintenance, Solar Finance & EMI"></textarea>
+      <p class="text-sm text-gray-500">Comma-separated list of services shown under “Our Services.”</p>
+    </div>
+
+    <!-- Newsletter -->
+    <div>
+      <h3 class="text-lg font-semibold text-green-700 mb-2">📬 Newsletter</h3>
+      <label class="block mb-2">Description
+        <textarea id="footer_newsletter" rows="2" class="card-input"
+          placeholder="Subscribe for updates on solar tech, savings tips, and GreenWave insights."></textarea>
+      </label>
+      <label class="block mb-2">Subscribe Button Text
+        <input id="footer_button_text" class="card-input" placeholder="Subscribe">
+      </label>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div>
+      <h3 class="text-lg font-semibold text-green-700 mb-2">📄 Bottom Bar</h3>
+      <label class="block mb-2">Copyright Text
+        <input id="footer_copyright" class="card-input" placeholder="© 2025 GreenWave. All rights reserved.">
+      </label>
+      <label class="block mb-2">Legal Links
+        <input id="footer_legal_links" class="card-input"
+          placeholder="Privacy Policy, Terms of Service">
+      </label>
+    </div>
+
+    <!-- Save Controls -->
+    <div class="flex gap-3 items-center">
+      <button class="save-btn bg-green-600 text-white px-4 py-2 rounded" data-path="footer">💾 Save Footer</button>
+      <button id="footerReload" type="button" class="bg-gray-100 px-4 py-2 rounded">↻ Reload</button>
+      <p id="footerSaveMsg" class="text-sm text-green-600 hidden">✅ Saved!</p>
+    </div>
+  </form>
+</section>
+
     </main>
   </div>
 
@@ -542,16 +602,28 @@
               break;
             }
             case 'footer': {
-              const links = (document.getElementById('footer_links').value || '').split(',').map(s=>s.trim()).filter(Boolean);
-              await update(ref(db, 'websiteContent/footer'), {
-                title: document.getElementById('footer_title').value || '',
-                subtitle: document.getElementById('footer_subtitle').value || '',
-                links,
-                copyright: document.getElementById('footer_copyright').value || ''
-              });
-              flashMsg(document.getElementById('footerSaveMsg'));
-              break;
-            }
+  const quickLinks = (document.getElementById('footer_quick_links').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+  const services = (document.getElementById('footer_services').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+  const legalLinks = (document.getElementById('footer_legal_links').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+
+  await update(ref(db, 'websiteContent/footer'), {
+    title: document.getElementById('footer_title').value || '',
+    subtitle: document.getElementById('footer_subtitle').value || '',
+    email: document.getElementById('footer_email').value || '',
+    phone: document.getElementById('footer_phone').value || '',
+    address: document.getElementById('footer_address').value || '',
+    quickLinks,
+    services,
+    newsletter: document.getElementById('footer_newsletter').value || '',
+    buttonText: document.getElementById('footer_button_text').value || '',
+    copyright: document.getElementById('footer_copyright').value || '',
+    legalLinks
+  });
+
+  flashMsg(document.getElementById('footerSaveMsg'));
+  break;
+}
+
             default:
               console.warn('unknown save path', path);
           }
@@ -667,15 +739,23 @@
     }
     document.getElementById('contactReload').addEventListener('click', loadContact);
 
-    async function loadFooter(){
-      const snap = await new Promise(res => onValue(ref(db, 'websiteContent/footer'), s=>res(s), { onlyOnce:true }));
-      const d = snap.val() || {};
-      document.getElementById('footer_title').value = d.title || '';
-      document.getElementById('footer_subtitle').value = d.subtitle || '';
-      document.getElementById('footer_links').value = (d.links || []).join(', ');
-      document.getElementById('footer_copyright').value = d.copyright || '';
-    }
-    document.getElementById('footerReload').addEventListener('click', loadFooter);
+    async function loadFooter() {
+  const snap = await new Promise(res => onValue(ref(db, 'websiteContent/footer'), s => res(s), { onlyOnce: true }));
+  const d = snap.val() || {};
+  document.getElementById('footer_title').value = d.title || '';
+  document.getElementById('footer_subtitle').value = d.subtitle || '';
+  document.getElementById('footer_email').value = d.email || '';
+  document.getElementById('footer_phone').value = d.phone || '';
+  document.getElementById('footer_address').value = d.address || '';
+  document.getElementById('footer_quick_links').value = (d.quickLinks || []).join(', ');
+  document.getElementById('footer_services').value = (d.services || []).join(', ');
+  document.getElementById('footer_newsletter').value = d.newsletter || '';
+  document.getElementById('footer_button_text').value = d.buttonText || 'Subscribe';
+  document.getElementById('footer_copyright').value = d.copyright || '';
+  document.getElementById('footer_legal_links').value = (d.legalLinks || []).join(', ');
+}
+document.getElementById('footerReload').addEventListener('click', loadFooter);
+
 
     // --- List helpers factories ---
     function makeAboutCard(title='', desc=''){
