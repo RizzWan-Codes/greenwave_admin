@@ -72,6 +72,12 @@
             <div class="text-sm text-gray-500">Last sync</div>
             <div id="stat-sync" class="text-2xl font-bold">—</div>
           </div>
+          <div class="bg-white p-4 rounded shadow">
+  <div class="text-sm text-gray-500">Total Visitors</div>
+  <div id="stat-visitors" class="text-2xl font-bold">—</div>
+</div>
+
+
         </div>
       </section>
 
@@ -484,6 +490,13 @@
       document.getElementById('stat-blogs').textContent = blogs;
       document.getElementById('stat-forms').textContent = forms;
     });
+
+    onValue(ref(db, 'analytics'), (snap) => {
+  const data = snap.val() || {};
+  document.getElementById('stat-visitors').textContent = data.visitors || 0;
+  document.getElementById('stat-clicks').textContent = data.clicks || 0;
+});
+
 
     // --- Generic save for simple object paths ---
     document.querySelectorAll('.save-btn').forEach(btn=>{
